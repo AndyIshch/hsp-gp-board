@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSP Grand Prix Tour | Hall of Fame</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#0a0a0f',
+                        gold: {
+                            light: '#f5d375',
+                            DEFAULT: '#c9a84c',
+                            dark: '#8b6914'
+                        },
+                        silver: '#b0b8c1',
+                        bronze: '#cd7f32',
+                        win: '#2ecc71',
+                        loss: '#e74c3c'
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        inter: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0a0f;
+            color: #f5f5f5;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-gold {
+            background: rgba(201, 168, 76, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            box-shadow: 0 4px 30px rgba(201, 168, 76, 0.1);
+        }
+        .text-glow-gold {
+            text-shadow: 0 0 20px rgba(201, 168, 76, 0.5);
+        }
+        .text-gradient-gold {
+            background: linear-gradient(to right, #f5d375, #c9a84c, #8b6914);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .instagram-gradient {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .instagram-bg {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+        #particles-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c9a84c;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f5d375;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .animate-shimmer {
+            background: linear-gradient(90deg, #c9a84c 0%, #f5d375 50%, #c9a84c 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+        .hero-letter {
+            display: inline-block;
+            opacity: 0;
+        }
+        .timeline-line {
+            width: 0;
+            transition: width 1.5s ease-out;
+        }
+        .season-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .season-content.active {
+            display: block;
+            opacity: 1;
+        }
+        .game-card-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        .game-card.expanded .game-card-content {
+            max-height: 1000px;
+        }
+        .game-card .chevron {
+            transition: transform 0.3s ease;
+        }
+        .game-card.expanded .chevron {
+            transform: rotate(180deg);
+        }
+        .podium-card {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+    </style>
+</head>
+<body class="font-inter antialiased relative">
+    <div id="lang-switcher" class="fixed top-6 right-6 z-50 flex gap-1 glass rounded-full p-1 border border-gold/30 shadow-[0_0_20px_rgba(201,168,76,0.2)]">
+        <button onclick="setLang('en')" data-lang="en" class="lang-btn px-3 py-1.5 rounded-full text-xs font-mono transition-all">EN</button>
+        <button onclick="setLang('ru')" data-lang="ru" class="lang-btn px-3 py-1.5 rounded-full text-xs font-mono transition-all">RU</button>
+        <button onclick="setLang('de')" data-lang="de" class="lang-btn px-3 py-1.5 rounded-full text-xs font-mono transition-all">DE</button>
+        <button onclick="setLang('es')" data-lang="es" class="lang-btn px-3 py-1.5 rounded-full text-xs font-mono transition-all">ES</button>
+    </div>
+
+    <!-- Audio -->
+    <audio id="bg-music" loop>
+        <source src="audio/the-voyage.mp3" type="audio/mpeg">
+        <source src="audio/epic-series.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Music Toggle -->
+    <button id="music-toggle" class="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full glass-gold flex items-center justify-center text-gold hover:text-gold-light hover:scale-110 transition-all duration-300 shadow-lg shadow-gold/20 cursor-pointer">
+        <svg id="icon-muted" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" clip-rule="evenodd" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+        <svg id="icon-playing" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+    </button>
+
+    <!-- A. Hero Section -->
+    <section id="hero" class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden px-4">
+        <canvas id="particles-canvas"></canvas>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(201,168,76,0.1)_0%,rgba(10,10,15,1)_70%)] z-0"></div>
+        
+        <div class="relative z-10 text-center flex flex-col items-center">
+            <h2 id="hero-school-name" class="font-cinzel text-gold tracking-[0.3em] text-sm md:text-xl mb-2 uppercase opacity-0 hero-elem">Higher School of Poker</h2>
+            <h3 id="hero-tour-name" class="font-inter text-silver tracking-widest text-xs md:text-sm mb-8 uppercase opacity-0 hero-elem">Grand Prix Tour</h3>
+            
+            <h1 id="hero-title" class="font-cinzel text-5xl md:text-8xl lg:text-9xl font-black mb-6 animate-shimmer text-glow-gold" data-text-key="hallOfFame">
+                HALL OF FAME
+            </h1>
+            
+            <div class="glass px-6 py-3 rounded-full mt-8 opacity-0 hero-elem">
+                <p id="hero-stats" class="font-mono text-silver text-sm md:text-base">
+                    <span class="text-gold">2018 — 2022</span> • 4 Seasons • 26 Games • <span class="text-win">₽69,500 Total</span>
+                </p>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-0 hero-elem cursor-pointer" onclick="document.getElementById('leaderboard').scrollIntoView({behavior: 'smooth'})">
+            <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        </div>
+    </section>
+
+    <!-- B. All-Time Leaderboard (Podium) -->
+    <section id="leaderboard" class="py-24 px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 id="leaderboard-title" class="font-cinzel text-4xl md:text-5xl text-gold mb-4">All-Time Champions</h2>
+                <div class="w-24 h-1 bg-gold mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-end justify-center gap-6 md:gap-4 lg:gap-8 mt-20" id="podium-container">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- C. Season Champions Timeline -->
+    <section id="timeline" class="py-24 px-4 bg-black/50 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 id="timeline-title" class="font-cinzel text-4xl md:text-5xl text-gold mb-4">The Eras</h2>
+                <div class="w-24 h-1 bg-gold mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="relative mt-20 mb-10">
+                <!-- Line -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-white/10 -translate-y-1/2 hidden md:block"></div>
+                <div id="timeline-progress" class="absolute top-1/2 left-0 h-1 bg-gold -translate-y-1/2 timeline-line hidden md:block shadow-[0_0_10px_#c9a84c]"></div>
+                
+                <!-- Nodes -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-12 md:gap-0 relative z-10" id="timeline-nodes">
+                    <!-- Generated by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- D. Season Deep Dives -->
+    <section id="seasons" class="py-24 px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 id="seasons-title" class="font-cinzel text-4xl md:text-5xl text-gold mb-4">Season Archives</h2>
+                <div class="w-24 h-1 bg-gold mx-auto rounded-full"></div>
+            </div>
+            
+            <!-- Tabs -->
+            <div class="flex justify-center gap-2 md:gap-4 mb-12 flex-wrap" id="season-tabs">
+                <!-- Generated by JS -->
+            </div>
+            
+            <!-- Content Container -->
+            <div id="season-content-container" class="relative min-h-[800px]">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- E. Player Biographies -->
+    <section id="biographies" class="py-24 px-4 bg-black/50 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 id="bios-title" class="font-cinzel text-4xl md:text-5xl text-gold mb-4">The Legends</h2>
+                <div class="w-24 h-1 bg-gold mx-auto rounded-full"></div>
+            </div>
+            
+            <div id="bios-container" class="space-y-32">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- F. Records & Statistics Hall -->
+    <section id="records" class="py-24 px-4 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 id="records-title" class="font-cinzel text-4xl md:text-5xl text-gold mb-4">Hall of Records</h2>
+                <div class="w-24 h-1 bg-gold mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="records-grid">
+                <!-- Generated by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- G. Instagram & Social Section -->
+    <section id="social" class="py-24 px-4 bg-black/80 relative z-10 border-t border-white/5">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 id="social-title" class="font-cinzel text-3xl md:text-4xl text-white mb-6">Follow the Action</h2>
+            <p id="social-subtitle" class="text-silver mb-10 text-lg">See behind-the-scenes moments, game nights, and celebrations</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-10 max-w-2xl mx-auto">
+                <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-gold/50 transition-all duration-300 hover:scale-[1.03]">
+                    <img src="instagram/instagram-1.jpg" alt="HSP GP game night" class="w-full h-full object-cover" loading="lazy">
+                </a>
+                <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-gold/50 transition-all duration-300 hover:scale-[1.03]">
+                    <img src="instagram/instagram-2.jpg" alt="HSP GP poker session" class="w-full h-full object-cover" loading="lazy">
+                </a>
+                <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-gold/50 transition-all duration-300 hover:scale-[1.03]">
+                    <img src="instagram/instagram-3.jpg" alt="HSP GP tournament" class="w-full h-full object-cover" loading="lazy">
+                </a>
+                <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-gold/50 transition-all duration-300 hover:scale-[1.03]">
+                    <img src="instagram/instagram-4.jpg" alt="HSP GP players" class="w-full h-full object-cover" loading="lazy">
+                </a>
+                <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-gold/50 transition-all duration-300 hover:scale-[1.03]">
+                    <img src="instagram/instagram-5.jpg" alt="HSP GP behind the scenes" class="w-full h-full object-cover" loading="lazy">
+                </a>
+                <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="aspect-square overflow-hidden rounded-xl border border-white/10 hover:border-gold/50 transition-all duration-300 hover:scale-[1.03]">
+                    <img src="instagram/instagram-6.jpg" alt="HSP GP celebration" class="w-full h-full object-cover" loading="lazy">
+                </a>
+            </div>
+            
+            <a href="https://www.instagram.com/hsp_gp" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-4 glass px-8 py-6 rounded-2xl hover:scale-105 transition-transform duration-300 group">
+                <div class="w-16 h-16 rounded-2xl instagram-bg flex items-center justify-center text-white shadow-lg">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                </div>
+                <span class="font-cinzel text-2xl md:text-3xl font-bold instagram-gradient group-hover:text-white transition-colors duration-300">@hsp_gp</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- H. Footer -->
+    <footer class="py-12 px-4 border-t border-white/10 relative z-10 bg-[#050508]">
+        <div class="max-w-6xl mx-auto flex flex-col items-center text-center">
+            <h4 id="footer-title" class="font-cinzel text-gold text-xl mb-2">Higher School of Poker — Grand Prix Tour</h4>
+            <p id="footer-subtitle" class="text-silver/60 font-mono text-sm mb-8">Hall of Fame • Est. 2018</p>
+            
+            <div class="flex gap-4 mb-8" id="footer-avatars">
+                <!-- Generated by JS -->
+            </div>
+            
+            <p id="footer-built-with" class="text-silver/40 text-sm">Built with ♠ ♥ ♦ ♣ and passion for poker</p>
+            <p id="footer-music-credit" class="text-silver/20 text-xs mt-4">Music by <a href="https://audionautix.com" class="underline hover:text-silver/40">Audionautix.com</a> (Jason Shaw) • CC BY 4.0</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // --- DATA ---
+        let currentLang = localStorage.getItem('hsp-lang') || 'en';
+        const chartInstances = [];
+
+        const TRANSLATIONS = {
+            en: {
+                schoolName: 'Higher School of Poker',
+                tourName: 'Grand Prix Tour',
+                hallOfFame: 'HALL OF FAME',
+                heroStats: '<span class="text-gold">2018 — 2022</span> • 4 Seasons • 26 Games • <span class="text-win">₽69,500 Total</span>',
+                allTimeChampions: 'All-Time Champions',
+                theEras: 'The Eras',
+                seasonArchives: 'Season Archives',
+                theLegends: 'The Legends',
+                hallOfRecords: 'Hall of Records',
+                followAction: 'Follow the Action',
+                followActionSub: 'See behind-the-scenes moments, game nights, and celebrations',
+                champion: 'Champion',
+                prizePool: 'Prize Pool',
+                games: 'Games',
+                goldenFish: 'Golden Fish',
+                place: 'Place',
+                player: 'Player',
+                money: 'Money',
+                rebuys: 'Rebuys',
+                fishPts: 'Fish Pts',
+                gameLog: 'Game Log',
+                seasonTrajectory: 'Season Trajectory',
+                seasonInsights: 'Season Insights',
+                wins: 'Wins',
+                winPct: 'Win %',
+                total: 'Total',
+                pool: 'Pool',
+                top4: 'Top 4',
+                cumulativeEarnings: 'Cumulative Earnings',
+                game: 'Game',
+                season: 'Season',
+                footerTitle: 'Higher School of Poker — Grand Prix Tour',
+                footerSubtitle: 'Hall of Fame • Est. 2018',
+                builtWith: 'Built with ♠ ♥ ♦ ♣ and passion for poker',
+                musicCredit: 'Music by Audionautix.com (Jason Shaw) • CC BY 4.0',
+                s1Name: 'Season 1 — The Beginning',
+                s2Name: 'Season 2 — The Comeback',
+                s3Name: 'Season 3 — Rebirth',
+                s4Name: 'Season 4 — The New Era',
+                titleMachine: 'The Machine',
+                titleNatural: 'The Natural',
+                titleUnderdog: 'The Underdog',
+                titleStrategist: 'The Strategist',
+                recMostSeasonWins: 'Most Season Wins',
+                recBiggestSingleWin: 'Biggest Single Win',
+                recWorstSeason: 'Worst Season',
+                recLongestWinStreak: 'Longest Win Streak',
+                recHighestWinRate: 'Highest Win Rate',
+                recGoldenFishRecord: 'Golden Fish Record',
+                recFewestRebuys: 'Fewest Rebuys',
+                recBiggestPrizePool: 'Biggest Prize Pool',
+                recMostTimeAtTable: 'Most Time at Table',
+                recZeroRebuysSeason: 'Zero Rebuys Season',
+                recMost1stPlaces: 'Most 1st Places',
+                recMost4thPlaces: 'Most 4th Places',
+                tagSeason3Champion: 'Season 3 Champion',
+                tagSeason4Champion: 'Season 4 Champion',
+                tagKingS2S3: 'King of Poker (S2-S3)',
+                tagAllTimeMoneyLeader: 'All-Time Money Leader',
+                tagSeason1Champion: 'Season 1 Champion',
+                tagKingS1S2: 'King of Poker (S1-S2)',
+                tagFewestRebuysAllTime: 'Fewest Rebuys All-Time',
+                tagEternalUnderdog: 'The Eternal Underdog',
+                tagMost4thPlaces: 'Most 4th Places (12)',
+                tagSeason2Champion: 'Season 2 Champion',
+                tagGoldenFishS2: 'Golden Fish S2 (15 pts)',
+                tagZeroRebuysS3: 'Zero Rebuys S3',
+                tagMost3rdPlaces: 'Most 3rd Places (12)',
+                unknownDate: 'Unknown'
+            },
+            ru: {
+                schoolName: 'Высшая Школа Покера',
+                tourName: 'Гран-При Тур',
+                hallOfFame: 'ЗАЛ СЛАВЫ',
+                heroStats: '<span class="text-gold">2018 — 2022</span> • 4 сезона • 26 игр • <span class="text-win">₽69 500 всего</span>',
+                allTimeChampions: 'Чемпионы всех времён',
+                theEras: 'Эпохи',
+                seasonArchives: 'Архив сезонов',
+                theLegends: 'Легенды',
+                hallOfRecords: 'Зал рекордов',
+                followAction: 'Следите за событиями',
+                followActionSub: 'Закулисные моменты, игровые вечера и празднования',
+                champion: 'Чемпион',
+                prizePool: 'Призовой фонд',
+                games: 'Игры',
+                goldenFish: 'Золотая рыбка',
+                place: 'Место',
+                player: 'Игрок',
+                money: 'Деньги',
+                rebuys: 'Ребаи',
+                fishPts: 'Очки',
+                gameLog: 'Журнал игр',
+                seasonTrajectory: 'Динамика сезона',
+                seasonInsights: 'Факты сезона',
+                wins: 'Победы',
+                winPct: 'Побед %',
+                total: 'Итого',
+                pool: 'Пот',
+                top4: 'Топ 4',
+                cumulativeEarnings: 'Накопительный баланс',
+                game: 'Игра',
+                season: 'Сезон',
+                footerTitle: 'Высшая Школа Покера — Гран-При Тур',
+                footerSubtitle: 'Зал Славы • Осн. 2018',
+                builtWith: 'Создано с ♠ ♥ ♦ ♣ и страстью к покеру',
+                musicCredit: 'Музыка: Audionautix.com (Jason Shaw) • CC BY 4.0',
+                s1Name: 'Сезон 1 — Начало',
+                s2Name: 'Сезон 2 — Камбэк',
+                s3Name: 'Сезон 3 — Перерождение',
+                s4Name: 'Сезон 4 — Новая эра',
+                titleMachine: 'Машина',
+                titleNatural: 'Талант',
+                titleUnderdog: 'Андердог',
+                titleStrategist: 'Стратег',
+                recMostSeasonWins: 'Больше всего побед в сезонах',
+                recBiggestSingleWin: 'Крупнейший выигрыш',
+                recWorstSeason: 'Худший сезон',
+                recLongestWinStreak: 'Самая длинная серия побед',
+                recHighestWinRate: 'Лучший винрейт',
+                recGoldenFishRecord: 'Рекорд Золотой рыбки',
+                recFewestRebuys: 'Меньше всего ребаев',
+                recBiggestPrizePool: 'Крупнейший призовой фонд',
+                recMostTimeAtTable: 'Больше всего времени за столом',
+                recZeroRebuysSeason: 'Сезон без ребаев',
+                recMost1stPlaces: 'Больше всего 1-х мест',
+                recMost4thPlaces: 'Больше всего 4-х мест',
+                tagSeason3Champion: 'Чемпион сезона 3',
+                tagSeason4Champion: 'Чемпион сезона 4',
+                tagKingS2S3: 'Король Покера (S2-S3)',
+                tagAllTimeMoneyLeader: 'Лидер по призовым за всё время',
+                tagSeason1Champion: 'Чемпион сезона 1',
+                tagKingS1S2: 'Король Покера (S1-S2)',
+                tagFewestRebuysAllTime: 'Минимум ребаев за всё время',
+                tagEternalUnderdog: 'Вечный андердог',
+                tagMost4thPlaces: 'Больше всего 4-х мест (12)',
+                tagSeason2Champion: 'Чемпион сезона 2',
+                tagGoldenFishS2: 'Золотая рыбка S2 (15 очков)',
+                tagZeroRebuysS3: 'Ноль ребаев в S3',
+                tagMost3rdPlaces: 'Больше всего 3-х мест (12)',
+                unknownDate: 'Неизвестно'
+            },
+            de: {
+                schoolName: 'Higher School of Poker',
+                tourName: 'Grand Prix Tour',
+                hallOfFame: 'HALL OF FAME',
+                heroStats: '<span class="text-gold">2018 — 2022</span> • 4 Saisons • 26 Spiele • <span class="text-win">₽69.500 Gesamt</span>',
+                allTimeChampions: 'Champions aller Zeiten',
+                theEras: 'Die Epochen',
+                seasonArchives: 'Saison-Archiv',
+                theLegends: 'Die Legenden',
+                hallOfRecords: 'Rekord-Halle',
+                followAction: 'Folge der Action',
+                followActionSub: 'Einblicke hinter die Kulissen, Spieleabende und Feierlichkeiten',
+                champion: 'Champion',
+                prizePool: 'Preispool',
+                games: 'Spiele',
+                goldenFish: 'Goldener Fisch',
+                place: 'Platz',
+                player: 'Spieler',
+                money: 'Geld',
+                rebuys: 'Rebuys',
+                fishPts: 'Fisch Pkt.',
+                gameLog: 'Spielprotokoll',
+                seasonTrajectory: 'Saisonverlauf',
+                seasonInsights: 'Saison-Highlights',
+                wins: 'Siege',
+                winPct: 'Sieg %',
+                total: 'Gesamt',
+                pool: 'Pool',
+                top4: 'Top 4',
+                cumulativeEarnings: 'Kumulative Einnahmen',
+                game: 'Spiel',
+                season: 'Saison',
+                footerTitle: 'Higher School of Poker — Grand Prix Tour',
+                footerSubtitle: 'Hall of Fame • Seit 2018',
+                builtWith: 'Erstellt mit ♠ ♥ ♦ ♣ und Leidenschaft für Poker',
+                musicCredit: 'Musik von Audionautix.com (Jason Shaw) • CC BY 4.0',
+                s1Name: 'Saison 1 — Der Anfang',
+                s2Name: 'Saison 2 — Das Comeback',
+                s3Name: 'Saison 3 — Die Wiedergeburt',
+                s4Name: 'Saison 4 — Die neue Ära',
+                titleMachine: 'Die Maschine',
+                titleNatural: 'Das Naturtalent',
+                titleUnderdog: 'Der Underdog',
+                titleStrategist: 'Der Stratege',
+                recMostSeasonWins: 'Meiste Saison-Siege',
+                recBiggestSingleWin: 'Größter Einzelgewinn',
+                recWorstSeason: 'Schlechteste Saison',
+                recLongestWinStreak: 'Längste Siegesserie',
+                recHighestWinRate: 'Höchste Siegquote',
+                recGoldenFishRecord: 'Goldener Fisch Rekord',
+                recFewestRebuys: 'Wenigste Rebuys',
+                recBiggestPrizePool: 'Größter Preispool',
+                recMostTimeAtTable: 'Meiste Zeit am Tisch',
+                recZeroRebuysSeason: 'Null-Rebuy-Saison',
+                recMost1stPlaces: 'Meiste 1. Plätze',
+                recMost4thPlaces: 'Meiste 4. Plätze',
+                tagSeason3Champion: 'Saison-3-Champion',
+                tagSeason4Champion: 'Saison-4-Champion',
+                tagKingS2S3: 'King of Poker (S2-S3)',
+                tagAllTimeMoneyLeader: 'All-Time-Geldführer',
+                tagSeason1Champion: 'Saison-1-Champion',
+                tagKingS1S2: 'King of Poker (S1-S2)',
+                tagFewestRebuysAllTime: 'Wenigste Rebuys aller Zeiten',
+                tagEternalUnderdog: 'Der ewige Underdog',
+                tagMost4thPlaces: 'Meiste 4. Plätze (12)',
+                tagSeason2Champion: 'Saison-2-Champion',
+                tagGoldenFishS2: 'Goldener Fisch S2 (15 Pkt.)',
+                tagZeroRebuysS3: 'Null Rebuys in S3',
+                tagMost3rdPlaces: 'Meiste 3. Plätze (12)',
+                unknownDate: 'Unbekannt'
+            },
+            es: {
+                schoolName: 'Higher School of Poker',
+                tourName: 'Grand Prix Tour',
+                hallOfFame: 'SALÓN DE LA FAMA',
+                heroStats: '<span class="text-gold">2018 — 2022</span> • 4 Temporadas • 26 Juegos • <span class="text-win">₽69,500 Total</span>',
+                allTimeChampions: 'Campeones de todos los tiempos',
+                theEras: 'Las Épocas',
+                seasonArchives: 'Archivo de temporadas',
+                theLegends: 'Las Leyendas',
+                hallOfRecords: 'Salón de récords',
+                followAction: 'Sigue la acción',
+                followActionSub: 'Momentos detrás de cámaras, noches de juego y celebraciones',
+                champion: 'Campeón',
+                prizePool: 'Pozo de premios',
+                games: 'Juegos',
+                goldenFish: 'Pez dorado',
+                place: 'Posición',
+                player: 'Jugador',
+                money: 'Dinero',
+                rebuys: 'Rebuys',
+                fishPts: 'Pts. Pez',
+                gameLog: 'Registro de juegos',
+                seasonTrajectory: 'Trayectoria de temporada',
+                seasonInsights: 'Datos de la temporada',
+                wins: 'Victorias',
+                winPct: '% Victorias',
+                total: 'Total',
+                pool: 'Pozo',
+                top4: 'Top 4',
+                cumulativeEarnings: 'Ganancias acumuladas',
+                game: 'Juego',
+                season: 'Temporada',
+                footerTitle: 'Higher School of Poker — Grand Prix Tour',
+                footerSubtitle: 'Salón de la Fama • Est. 2018',
+                builtWith: 'Creado con ♠ ♥ ♦ ♣ y pasión por el póker',
+                musicCredit: 'Música por Audionautix.com (Jason Shaw) • CC BY 4.0',
+                s1Name: 'Temporada 1 — El Comienzo',
+                s2Name: 'Temporada 2 — La Remontada',
+                s3Name: 'Temporada 3 — El Renacimiento',
+                s4Name: 'Temporada 4 — La Nueva Era',
+                titleMachine: 'La Máquina',
+                titleNatural: 'El Natural',
+                titleUnderdog: 'El Desvalido',
+                titleStrategist: 'El Estratega',
+                recMostSeasonWins: 'Más victorias por temporada',
+                recBiggestSingleWin: 'Mayor ganancia individual',
+                recWorstSeason: 'Peor temporada',
+                recLongestWinStreak: 'Racha ganadora más larga',
+                recHighestWinRate: 'Mayor tasa de victorias',
+                recGoldenFishRecord: 'Récord del Pez Dorado',
+                recFewestRebuys: 'Menos rebuys',
+                recBiggestPrizePool: 'Mayor pozo de premios',
+                recMostTimeAtTable: 'Más tiempo en la mesa',
+                recZeroRebuysSeason: 'Temporada sin rebuys',
+                recMost1stPlaces: 'Más 1.er lugares',
+                recMost4thPlaces: 'Más 4.º lugares',
+                tagSeason3Champion: 'Campeón de la Temporada 3',
+                tagSeason4Champion: 'Campeón de la Temporada 4',
+                tagKingS2S3: 'Rey del Póker (S2-S3)',
+                tagAllTimeMoneyLeader: 'Líder histórico en ganancias',
+                tagSeason1Champion: 'Campeón de la Temporada 1',
+                tagKingS1S2: 'Rey del Póker (S1-S2)',
+                tagFewestRebuysAllTime: 'Menos rebuys de la historia',
+                tagEternalUnderdog: 'El eterno desvalido',
+                tagMost4thPlaces: 'Más 4.º lugares (12)',
+                tagSeason2Champion: 'Campeón de la Temporada 2',
+                tagGoldenFishS2: 'Pez Dorado S2 (15 pts)',
+                tagZeroRebuysS3: 'Cero rebuys en S3',
+                tagMost3rdPlaces: 'Más 3.er lugares (12)',
+                unknownDate: 'Desconocido'
+            }
+        };
+
+        const t = (key) => TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS.en[key] || key;
+
+        const HSP_DATA = {
+          tournament: {
+            name: "Higher School of Poker",
+            subtitle: "Grand Prix Tour",
+            tagline: "Hall of Fame",
+            yearRange: "2018 — 2022",
+            totalGames: 26,
+            totalSeasons: 4,
+            totalPrizePool: 69500,
+          },
+          players: {
+            stparitet: {
+              id: "stparitet",
+              name: "Stparitet",
+              aliases: ["ai", "stparitet"],
+              avatar: "avatars/ai-stpartitet.jpg",
+              avatarDescription: "Man with racing jacket and headphones",
+              totalMoney: 6525,
+              totalRebuys: 12,
+              totalGames: 26,
+              allTimePlaces: { "1st": 9, "2nd": 7, "3rd": 7, "4th": 3 },
+              seasonResults: [
+                { season: 1, place: 2, money: 300, rebuys: 5 },
+                { season: 2, place: 3, money: -275, rebuys: 3 },
+                { season: 3, place: 1, money: 4500, rebuys: 4 },
+                { season: 4, place: 1, money: 2000, rebuys: 0 },
+              ],
+              titles: ["tagSeason3Champion", "tagSeason4Champion", "tagKingS2S3", "tagAllTimeMoneyLeader"],
+            },
+            safdenz: {
+              id: "safdenz",
+              name: "Safdenz",
+              aliases: ["safdenz"],
+              avatar: "avatars/safdenz.jpg",
+              avatarDescription: "Bearded man in Jordan shirt",
+              totalMoney: 5925,
+              totalRebuys: 7,
+              totalGames: 26,
+              allTimePlaces: { "1st": 9, "2nd": 7, "3rd": 3, "4th": 7 },
+              seasonResults: [
+                { season: 1, place: 1, money: 6600, rebuys: 1 },
+                { season: 2, place: 2, money: -175, rebuys: 3 },
+                { season: 3, place: 3, money: -500, rebuys: 3 },
+                { season: 4, place: 2, money: 0, rebuys: 0 },
+              ],
+              titles: ["tagSeason1Champion", "tagKingS1S2", "tagFewestRebuysAllTime"],
+            },
+            derupo: {
+              id: "derupo",
+              name: "Derupo",
+              aliases: ["derupo"],
+              avatar: "avatars/derupo.jpg",
+              avatarDescription: "Young man at marina",
+              totalMoney: -8725,
+              totalRebuys: 12,
+              totalGames: 26,
+              allTimePlaces: { "1st": 4, "2nd": 6, "3rd": 4, "4th": 12 },
+              seasonResults: [
+                { season: 1, place: 3, money: -1950, rebuys: 5 },
+                { season: 2, place: 4, money: -1775, rebuys: 3 },
+                { season: 3, place: 4, money: -4000, rebuys: 4 },
+                { season: 4, place: 4, money: -1000, rebuys: 0 },
+              ],
+              titles: ["tagEternalUnderdog", "tagMost4thPlaces"],
+            },
+            thegod: {
+              id: "thegod",
+              name: "TheGod",
+              aliases: ["thegod"],
+              avatar: "avatars/thegod.jpg",
+              avatarDescription: "Man with glasses at conference",
+              totalMoney: -3775,
+              totalRebuys: 7,
+              totalGames: 26,
+              allTimePlaces: { "1st": 4, "2nd": 6, "3rd": 12, "4th": 4 },
+              seasonResults: [
+                { season: 1, place: 4, money: -4950, rebuys: 5 },
+                { season: 2, place: 1, money: 2175, rebuys: 2 },
+                { season: 3, place: 2, money: 0, rebuys: 0 },
+                { season: 4, place: 3, money: -1000, rebuys: 0 },
+              ],
+              titles: ["tagSeason2Champion", "tagGoldenFishS2", "tagZeroRebuysS3", "tagMost3rdPlaces"],
+            },
+          },
+          seasons: [
+            {
+              number: 1,
+              name: { en: "Season 1 — The Beginning", ru: "Сезон 1 — Начало", de: "Saison 1 — Der Anfang", es: "Temporada 1 — El Comienzo" },
+              period: { en: "September 2018 — February 2019", ru: "Сентябрь 2018 — Февраль 2019", de: "September 2018 — Februar 2019", es: "Septiembre 2018 — Febrero 2019" },
+              gameCount: 9,
+              totalPrizePool: 22500,
+              champion: "safdenz",
+              goldenFish: { winner: "safdenz", note: "Tied with derupo (12 pts each)" },
+              standings: [
+                { player: "safdenz", place: 1, money: 6600, rebuys: 1, goldenFish: 12 },
+                { player: "stparitet", place: 2, money: 300, rebuys: 5, goldenFish: 5 },
+                { player: "derupo", place: 3, money: -1950, rebuys: 5, goldenFish: 12 },
+                { player: "thegod", place: 4, money: -4950, rebuys: 5, goldenFish: 7 },
+              ],
+              games: [
+                { number: 1, date: "08.09.18", buyIn: 300, rebuys: 3, totalPool: 2100, results: { derupo: -450, stparitet: 1650, safdenz: -600, thegod: -600 }, places: { "1st": "stparitet", "2nd": "derupo", "3rd": "safdenz", "4th": "thegod" } },
+                { number: 2, date: "15.09.18", buyIn: 350, rebuys: 2, totalPool: 2100, results: { derupo: -350, stparitet: 1225, safdenz: -175, thegod: -700 }, places: { "1st": "stparitet", "2nd": "safdenz", "3rd": "derupo", "4th": "thegod" } },
+                { number: 3, date: "05.10.18", buyIn: 400, rebuys: 3, totalPool: 2800, results: { derupo: -600, stparitet: -800, safdenz: 2200, thegod: -800 }, places: { "1st": "safdenz", "2nd": "derupo", "3rd": "stparitet", "4th": "thegod" } },
+                { number: 4, date: "20.10.18", buyIn: 500, rebuys: 2, totalPool: 3000, results: { derupo: -500, stparitet: -750, safdenz: 2250, thegod: -1000 }, places: { "1st": "safdenz", "2nd": "stparitet", "3rd": "derupo", "4th": "thegod" } },
+                { number: 5, date: "02.11.18", buyIn: 400, rebuys: 1, totalPool: 2000, results: { derupo: -400, stparitet: -800, safdenz: 1400, thegod: -200 }, places: { "1st": "safdenz", "2nd": "thegod", "3rd": "derupo", "4th": "stparitet" } },
+                { number: 6, date: "16.11.18", buyIn: 300, rebuys: 2, totalPool: 1800, results: { derupo: -450, stparitet: -600, safdenz: 1350, thegod: -300 }, places: { "1st": "safdenz", "2nd": "derupo", "3rd": "stparitet", "4th": "thegod" } },
+                { number: 7, date: "07.12.18", buyIn: 350, rebuys: 2, totalPool: 2100, results: { derupo: -1050, stparitet: 1575, safdenz: -175, thegod: -350 }, places: { "1st": "stparitet", "2nd": "derupo", "3rd": "safdenz", "4th": "thegod" } },
+                { number: 8, date: "22.12.18", buyIn: 400, rebuys: 0, totalPool: 1600, results: { derupo: -400, stparitet: -200, safdenz: -400, thegod: 1000 }, places: { "1st": "thegod", "2nd": "stparitet", "3rd": "derupo", "4th": "safdenz" } },
+                { number: 9, date: "09.02.19", buyIn: 1000, rebuys: 1, totalPool: 5000, results: { derupo: 2250, stparitet: -1000, safdenz: 750, thegod: -2000 }, places: { "1st": "derupo", "2nd": "safdenz", "3rd": "stparitet", "4th": "thegod" } },
+              ],
+              insights: [
+                { en: "Safdenz dominated with 4 first-place finishes out of 9 games — a 44% win rate that remains the highest single-season record", ru: "Safdenz доминировал: 4 первых места в 9 играх — винрейт 44%, который до сих пор остаётся лучшим рекордом одного сезона", de: "Safdenz dominierte mit 4 ersten Plätzen in 9 Spielen — eine Siegquote von 44%, bis heute der beste Einzel-Saison-Rekord", es: "Safdenz dominó con 4 primeros lugares en 9 juegos: un 44% de victorias que sigue siendo el mejor récord de una sola temporada" },
+                { en: "Stparitet opened the tournament with back-to-back wins (Games 1 & 2) but couldn't sustain the momentum", ru: "Stparitet открыл турнир двумя победами подряд (Игры 1 и 2), но не смог удержать импульс", de: "Stparitet eröffnete das Turnier mit zwei Siegen in Folge (Spiel 1 und 2), konnte das Momentum aber nicht halten", es: "Stparitet abrió el torneo con dos victorias consecutivas (Juegos 1 y 2), pero no logró sostener el impulso" },
+                { en: "TheGod finished 3rd or 4th in 7 out of 9 games, setting up his redemption arc in Season 2", ru: "TheGod завершал 3-м или 4-м в 7 из 9 игр, заложив основу для своего камбэка в Сезоне 2", de: "TheGod wurde in 7 von 9 Spielen Dritter oder Vierter und legte damit den Grundstein für seinen Redemption-Arc in Saison 2", es: "TheGod terminó 3.º o 4.º en 7 de 9 juegos, preparando su arco de redención en la Temporada 2" },
+                { en: "The season finale (Game 9) had the highest buy-in at ₽1000 — and Derupo, the eternal underdog, won it", ru: "Финал сезона (Игра 9) имел самый высокий buy-in — ₽1000, и его взял Derupo, вечный андердог", de: "Das Saisonfinale (Spiel 9) hatte mit ₽1000 das höchste Buy-in — und Derupo, der ewige Underdog, gewann", es: "La final de temporada (Juego 9) tuvo el buy-in más alto, ₽1000, y la ganó Derupo, el eterno desvalido" },
+                { en: "Safdenz had only 1 rebuy in the entire season — the most disciplined play in HSP GP history", ru: "У Safdenz был всего 1 ребай за весь сезон — самая дисциплинированная игра в истории HSP GP", de: "Safdenz hatte in der ganzen Saison nur 1 Rebuy — das disziplinierteste Spiel der HSP-GP-Geschichte", es: "Safdenz tuvo solo 1 rebuy en toda la temporada: el juego más disciplinado en la historia de HSP GP" },
+                { en: "Golden Fish race ended in a tie: Safdenz and Derupo both scored 12 points", ru: "Гонка за Golden Fish завершилась ничьей: Safdenz и Derupo набрали по 12 очков", de: "Das Golden-Fish-Rennen endete unentschieden: Safdenz und Derupo erzielten jeweils 12 Punkte", es: "La carrera por el Golden Fish terminó en empate: Safdenz y Derupo sumaron 12 puntos cada uno" },
+                { en: "Game 8 was the only game with 0 rebuys — the tightest, most careful session ever played", ru: "Игра 8 стала единственной игрой с 0 ребаев — самой аккуратной и плотной сессией за всё время", de: "Spiel 8 war das einzige Spiel mit 0 Rebuys — die tighteste und kontrollierteste Session überhaupt", es: "El Juego 8 fue el único con 0 rebuys: la sesión más tight y cuidadosa de todas" },
+                { en: "TheGod's -4950 is the worst single-season performance in HSP GP history", ru: "-4950 у TheGod — худший результат одного сезона в истории HSP GP", de: "TheGods -4950 ist die schlechteste Einzel-Saison-Leistung der HSP-GP-Geschichte", es: "El -4950 de TheGod es el peor rendimiento de una sola temporada en la historia de HSP GP" },
+                { en: "Stparitet earned exactly +300 for the season — break-even survival at its finest", ru: "Stparitet заработал ровно +300 за сезон — эталонное выживание в ноль-плюс", de: "Stparitet holte exakt +300 in der Saison — Break-even-Survival in Perfektion", es: "Stparitet ganó exactamente +300 en la temporada: supervivencia break-even en su mejor versión" },
+                { en: "Total prize pool across 9 games: ₽22,500 — the first fortune ever bet at the HSP table", ru: "Общий призовой фонд за 9 игр: ₽22,500 — первое большое состояние, разыгранное за столом HSP", de: "Gesamtpreispool über 9 Spiele: ₽22.500 — das erste große Vermögen, das am HSP-Tisch ausgespielt wurde", es: "Pozo total en 9 juegos: ₽22,500, la primera gran fortuna apostada en la mesa HSP" },
+                { en: "Safdenz strung together a 4-game winning streak (Games 3-6) — never matched in any season", ru: "Safdenz собрал серию из 4 побед подряд (Игры 3-6) — этот результат не повторён ни в одном сезоне", de: "Safdenz legte eine 4-Spiele-Siegesserie hin (Spiele 3-6) — bis heute in keiner Saison erreicht", es: "Safdenz encadenó una racha de 4 victorias (Juegos 3-6), nunca igualada en ninguna temporada" },
+                { en: "Derupo went negative in 7 of 9 games but ended with a heroic +2250 in the finale", ru: "Derupo ушёл в минус в 7 из 9 игр, но завершил сезон героическими +2250 в финале", de: "Derupo war in 7 von 9 Spielen im Minus, beendete die Saison aber mit heroischen +2250 im Finale", es: "Derupo quedó en negativo en 7 de 9 juegos, pero cerró con un heroico +2250 en la final" },
+                { en: "The average buy-in was ₽444 per game, with stakes doubling by the end of the season", ru: "Средний buy-in составил ₽444 за игру, а к концу сезона ставки удвоились", de: "Das durchschnittliche Buy-in lag bei ₽444 pro Spiel, und bis Saisonende hatten sich die Stakes verdoppelt", es: "El buy-in promedio fue de ₽444 por juego, y al final de la temporada las apuestas se duplicaron" },
+                { en: "No player maintained positive money in ALL games — everyone tasted defeat", ru: "Ни один игрок не удержал плюс во ВСЕХ играх — поражение попробовали все", de: "Kein Spieler blieb in ALLEN Spielen im Plus — jeder kostete Niederlagen", es: "Ningún jugador se mantuvo en positivo en TODOS los juegos: todos probaron la derrota" },
+                { en: "Game 4 had the highest base buy-in (₽500) of the first half, testing everyone's bankroll management", ru: "Игра 4 имела самый высокий базовый buy-in (₽500) в первой половине сезона, проверив банкролл-менеджмент каждого", de: "Spiel 4 hatte das höchste Basis-Buy-in (₽500) der ersten Saisonhälfte und testete das Bankroll-Management aller", es: "El Juego 4 tuvo el buy-in base más alto (₽500) de la primera mitad, poniendo a prueba el manejo de bankroll de todos" },
+              ],
+            },
+            {
+              number: 2,
+              name: { en: "Season 2 — The Comeback", ru: "Сезон 2 — Камбэк", de: "Saison 2 — Das Comeback", es: "Temporada 2 — La Remontada" },
+              period: { en: "February 2019 — October 2019", ru: "Февраль 2019 — Октябрь 2019", de: "Februar 2019 — Oktober 2019", es: "Febrero 2019 — Octubre 2019" },
+              gameCount: 9,
+              totalPrizePool: 20500,
+              champion: "thegod",
+              goldenFish: { winner: "thegod", score: 15 },
+              standings: [
+                { player: "thegod", place: 1, money: 2175, rebuys: 2, goldenFish: 15 },
+                { player: "safdenz", place: 2, money: -175, rebuys: 3, goldenFish: 8 },
+                { player: "stparitet", place: 3, money: -275, rebuys: 3, goldenFish: 5 },
+                { player: "derupo", place: 4, money: -1775, rebuys: 3, goldenFish: 8 },
+              ],
+              games: [
+                { number: 1, date: "23.02.19", buyIn: 300, rebuys: 4, totalPool: 2400, results: { derupo: -600, stparitet: -750, safdenz: 1950, thegod: -600 }, places: { "1st": "safdenz", "2nd": "derupo", "3rd": "stparitet", "4th": "thegod" } },
+                { number: 2, date: "23.03.19", buyIn: 350, rebuys: 0, totalPool: 1400, results: { derupo: 875, stparitet: -175, safdenz: -350, thegod: -350 }, places: { "1st": "derupo", "2nd": "stparitet", "3rd": "safdenz", "4th": "thegod" } },
+                { number: 3, date: "30.03.19", buyIn: 400, rebuys: 0, totalPool: 1600, results: { derupo: 1000, stparitet: -400, safdenz: -400, thegod: -200 }, places: { "1st": "derupo", "2nd": "thegod", "3rd": "stparitet", "4th": "safdenz" } },
+                { number: 4, date: "20.04.19", buyIn: 500, rebuys: 0, totalPool: 2000, results: { derupo: -500, stparitet: 1250, safdenz: -250, thegod: -500 }, places: { "1st": "stparitet", "2nd": "safdenz", "3rd": "derupo", "4th": "thegod" } },
+                { number: 5, date: "11.05.19", buyIn: 400, rebuys: 3, totalPool: 2800, results: { derupo: -800, stparitet: 2200, safdenz: -800, thegod: -600 }, places: { "1st": "stparitet", "2nd": "derupo", "3rd": "thegod", "4th": "safdenz" } },
+                { number: 6, date: "24.05.19", buyIn: 300, rebuys: 0, totalPool: 1200, results: { derupo: -150, stparitet: -300, safdenz: 700, thegod: -300 }, places: { "1st": "safdenz", "2nd": "derupo", "3rd": "stparitet", "4th": "thegod" } },
+                { number: 7, date: "01.06.19", buyIn: 350, rebuys: 2, totalPool: 2100, results: { derupo: -700, stparitet: -700, safdenz: 1575, thegod: -175 }, places: { "1st": "safdenz", "2nd": "thegod", "3rd": "stparitet", "4th": "derupo" } },
+                { number: 8, date: "15.06.19", buyIn: 400, rebuys: 1, totalPool: 2000, results: { derupo: -400, stparitet: -400, safdenz: -600, thegod: 1400 }, places: { "1st": "thegod", "2nd": "derupo", "3rd": "stparitet", "4th": "safdenz" } },
+                { number: 9, date: "12.10.19", buyIn: 1000, rebuys: 1, totalPool: 5000, results: { derupo: -500, stparitet: -1000, safdenz: -2000, thegod: 3500 }, places: { "1st": "thegod", "2nd": "derupo", "3rd": "safdenz", "4th": "stparitet" } },
+              ],
+              insights: [
+                { en: "TheGod's redemption arc: from worst in S1 (-4950) to champion in S2 (+2175) — the greatest comeback in HSP history", ru: "Арка искупления TheGod: от худшего результата в S1 (-4950) до чемпиона S2 (+2175) — величайший камбэк в истории HSP", de: "TheGods Redemption-Arc: vom schlechtesten Ergebnis in S1 (-4950) zum Champion in S2 (+2175) — das größte Comeback der HSP-Geschichte", es: "Arco de redención de TheGod: de peor en S1 (-4950) a campeón en S2 (+2175), el mayor comeback en la historia de HSP" },
+                { en: "TheGod dominated Golden Fish with 15 points — nearly double the next competitors (Safdenz & Derupo at 8)", ru: "TheGod доминировал в Golden Fish с 15 очками — почти вдвое больше ближайших преследователей (Safdenz и Derupo по 8)", de: "TheGod dominierte Golden Fish mit 15 Punkten — fast doppelt so viel wie die nächsten Verfolger (Safdenz und Derupo mit 8)", es: "TheGod dominó el Golden Fish con 15 puntos, casi el doble de los siguientes competidores (Safdenz y Derupo con 8)" },
+                { en: "TheGod never finished 4th in any S2 game — zero last-place finishes across 9 games", ru: "TheGod ни разу не финишировал 4-м ни в одной игре S2 — ноль последних мест за 9 игр", de: "TheGod wurde in keinem S2-Spiel Vierter — null letzte Plätze in 9 Spielen", es: "TheGod nunca terminó 4.º en ningún juego de S2: cero últimos lugares en 9 juegos" },
+                { en: "Game 9 decided everything: TheGod won +3500 in the ₽5000 pool, while Safdenz lost -2000", ru: "Игра 9 решила всё: TheGod взял +3500 в банке ₽5000, а Safdenz проиграл -2000", de: "Spiel 9 entschied alles: TheGod gewann +3500 aus dem ₽5000-Pool, während Safdenz -2000 verlor", es: "El Juego 9 decidió todo: TheGod ganó +3500 en un pozo de ₽5000, mientras Safdenz perdió -2000" },
+                { en: "Only 11 total rebuys across the entire season — the most disciplined season overall", ru: "Всего 11 ребаев за весь сезон — самый дисциплинированный сезон в целом", de: "Nur 11 Rebuys in der gesamten Saison — insgesamt die disziplinierteste Saison", es: "Solo 11 rebuys en toda la temporada: la temporada más disciplinada en general" },
+                { en: "Three games had ZERO rebuys (Games 2, 3, 4) — unprecedented tight play", ru: "В трёх играх было ZERO rebuys (Игры 2, 3, 4) — беспрецедентно tight-игра", de: "Drei Spiele hatten ZERO Rebuys (Spiele 2, 3, 4) — beispiellos tightes Spiel", es: "Tres juegos tuvieron ZERO rebuys (Juegos 2, 3 y 4): un juego tight sin precedentes" },
+                { en: "Derupo won Games 2 & 3 back-to-back but couldn't capitalize, ending at -1775", ru: "Derupo выиграл Игры 2 и 3 подряд, но не смог развить успех и закончил на -1775", de: "Derupo gewann Spiel 2 und 3 in Folge, konnte es aber nicht kapitalisieren und endete bei -1775", es: "Derupo ganó los Juegos 2 y 3 seguidos, pero no pudo capitalizar y terminó en -1775" },
+                { en: "Safdenz started strong (winning Game 1 with +1950) but collapsed in the finale (-2000)", ru: "Safdenz начал мощно (победа в Игре 1 с +1950), но обрушился в финале (-2000)", de: "Safdenz startete stark (Sieg in Spiel 1 mit +1950), brach aber im Finale ein (-2000)", es: "Safdenz empezó fuerte (ganó el Juego 1 con +1950), pero colapsó en la final (-2000)" },
+                { en: "Total time at the table: 12,368 minutes (206 hours) — TheGod spent the most time playing (3,405 min)", ru: "Общее время за столом: 12,368 минут (206 часов) — больше всех играл TheGod (3,405 мин)", de: "Gesamtzeit am Tisch: 12.368 Minuten (206 Stunden) — TheGod spielte am meisten (3.405 Min)", es: "Tiempo total en mesa: 12,368 minutos (206 horas); TheGod pasó más tiempo jugando (3,405 min)" },
+                { en: "Season 2 had the lowest total prize pool (₽20,500) — more conservative betting", ru: "У Сезона 2 был самый низкий общий призовой фонд (₽20,500) — более консервативные ставки", de: "Saison 2 hatte den niedrigsten Gesamtpreispool (₽20.500) — konservativeres Betting", es: "La Temporada 2 tuvo el pozo total más bajo (₽20,500): apuestas más conservadoras" },
+                { en: "Stparitet had two massive wins (Games 4-5: +1250 and +2200) sandwiched between losses", ru: "У Stparitet были две массивные победы (Игры 4-5: +1250 и +2200) между поражениями", de: "Stparitet hatte zwei massive Siege (Spiele 4-5: +1250 und +2200), eingerahmt von Verlusten", es: "Stparitet tuvo dos grandes victorias (Juegos 4-5: +1250 y +2200) entre derrotas" },
+                { en: "Game 6 was the smallest pool (₽1200) — a calm before the storm of the ₽5000 finale", ru: "Игра 6 имела минимальный банк (₽1200) — затишье перед бурей финала на ₽5000", de: "Spiel 6 war der kleinste Pool (₽1200) — die Ruhe vor dem Sturm des ₽5000-Finales", es: "El Juego 6 tuvo el pozo más pequeño (₽1200): calma antes de la tormenta del final de ₽5000" },
+                { en: "All four players finished within ₽3,950 of each other in final standings — the tightest season", ru: "Все четыре игрока финишировали в пределах ₽3,950 друг от друга в итоговой таблице — самый плотный сезон", de: "Alle vier Spieler lagen in der Endabrechnung innerhalb von ₽3.950 — die engste Saison", es: "Los cuatro jugadores terminaron a menos de ₽3,950 entre sí en la tabla final: la temporada más cerrada" },
+                { en: "Average game duration was ~343 minutes (5.7 hours) per session", ru: "Средняя длительность игры составила ~343 минуты (5.7 часа) на сессию", de: "Die durchschnittliche Spieldauer betrug ~343 Minuten (5,7 Stunden) pro Session", es: "La duración promedio por juego fue de ~343 minutos (5.7 horas) por sesión" },
+                { en: "The gap between the finales was 4 months (June → October) — the longest break between games in any season", ru: "Разрыв между финальными играми составил 4 месяца (June → October) — самая длинная пауза между играми в любом сезоне", de: "Die Lücke zwischen den Finalspielen betrug 4 Monate (June → October) — die längste Pause zwischen Spielen in einer Saison", es: "La brecha entre finales fue de 4 meses (June → October), la pausa más larga entre juegos en cualquier temporada" },
+              ],
+            },
+            {
+              number: 3,
+              name: { en: "Season 3 — Rebirth", ru: "Сезон 3 — Перерождение", de: "Saison 3 — Die Wiedergeburt", es: "Temporada 3 — El Renacimiento" },
+              period: { en: "December 2019 — June 2022", ru: "Декабрь 2019 — Июнь 2022", de: "Dezember 2019 — Juni 2022", es: "Diciembre 2019 — Junio 2022" },
+              gameCount: 7,
+              totalPrizePool: 22500,
+              champion: "stparitet",
+              goldenFish: null,
+              standings: [
+                { player: "stparitet", place: 1, money: 4500, rebuys: 4 },
+                { player: "thegod", place: 2, money: 0, rebuys: 0 },
+                { player: "safdenz", place: 3, money: -500, rebuys: 3 },
+                { player: "derupo", place: 4, money: -4000, rebuys: 4 },
+              ],
+              games: [
+                { number: 1, date: "Unknown", buyIn: 500, rebuys: 2, totalPool: 3000, results: { derupo: -500, stparitet: -1000, safdenz: 1000, thegod: 500 }, places: {} },
+                { number: 2, date: "21.12.19", buyIn: 500, rebuys: 1, totalPool: 2500, results: { derupo: 1500, stparitet: -500, safdenz: -500, thegod: -500 }, places: {} },
+                { number: 3, date: "26.01.20", buyIn: 500, rebuys: 0, totalPool: 2000, results: { derupo: 0, stparitet: 1000, safdenz: -500, thegod: -500 }, places: {} },
+                { number: 4, date: "21.02.20", buyIn: 500, rebuys: 2, totalPool: 3000, results: { derupo: -1000, stparitet: 0, safdenz: -1000, thegod: 2000 }, places: {} },
+                { number: 5, date: "15.06.22", buyIn: 500, rebuys: 3, totalPool: 3500, results: { derupo: -1000, stparitet: 2000, safdenz: -1000, thegod: 0 }, places: {} },
+                { number: 6, date: "18.06.22", buyIn: 500, rebuys: 1, totalPool: 2500, results: { derupo: -1000, stparitet: 0, safdenz: 1500, thegod: -500 }, places: {} },
+                { number: 7, date: "25.06.22", buyIn: 1000, rebuys: 2, totalPool: 6000, results: { derupo: -2000, stparitet: 3000, safdenz: 0, thegod: -1000 }, places: {} },
+              ],
+              insights: [
+                { en: "Stparitet's coronation: won Season 3 with +4500 and earned the 'King of Poker' title for S2-S3", ru: "Коронация Stparitet: победа в Сезоне 3 с +4500 и титул 'Король Покера' за S2-S3", de: "Stparitets Krönung: gewann Saison 3 mit +4500 und sicherte sich den Titel 'King of Poker' für S2-S3", es: "Coronación de Stparitet: ganó la Temporada 3 con +4500 y obtuvo el título de 'King of Poker' para S2-S3" },
+                { en: "Season 3 had a 2+ year gap — Games 4 (Feb 2020) to Game 5 (Jun 2022) due to the pandemic", ru: "В Сезоне 3 был разрыв более 2 лет — от Игры 4 (Feb 2020) до Игры 5 (Jun 2022) из-за пандемии", de: "Saison 3 hatte eine Lücke von über 2 Jahren — von Spiel 4 (Feb 2020) bis Spiel 5 (Jun 2022) wegen der Pandemie", es: "La Temporada 3 tuvo una pausa de más de 2 años: del Juego 4 (Feb 2020) al Juego 5 (Jun 2022) por la pandemia" },
+                { en: "TheGod achieved the impossible: ZERO rebuys across all 7 games — the most disciplined season by any player EVER", ru: "TheGod сделал невозможное: ZERO rebuys во всех 7 играх — самый дисциплинированный сезон любого игрока EVER", de: "TheGod schaffte das Unmögliche: ZERO Rebuys über alle 7 Spiele — die disziplinierteste Saison eines Spielers EVER", es: "TheGod logró lo imposible: ZERO rebuys en los 7 juegos, la temporada más disciplinada de cualquier jugador EVER" },
+                { en: "TheGod finished at exactly ₽0 — perfect break-even despite never rebuying", ru: "TheGod закончил ровно на ₽0 — идеальный break-even без единого ребая", de: "TheGod beendete die Saison exakt bei ₽0 — perfektes Break-even ohne einen einzigen Rebuy", es: "TheGod terminó exactamente en ₽0: break-even perfecto sin hacer ni un rebuy" },
+                { en: "All buy-ins were ₽500 (except the ₽1000 finale) — the most uniform stakes in any season", ru: "Все buy-in были ₽500 (кроме финала на ₽1000) — самые равномерные ставки среди всех сезонов", de: "Alle Buy-ins lagen bei ₽500 (außer dem ₽1000-Finale) — die einheitlichsten Stakes aller Saisons", es: "Todos los buy-ins fueron de ₽500 (excepto la final de ₽1000): las apuestas más uniformes de cualquier temporada" },
+                { en: "Stparitet won the finale by +3000 in a ₽6000 pool — the largest single-game payday in S3", ru: "Stparitet выиграл финал с +3000 в банке ₽6000 — крупнейшая выплата за одну игру в S3", de: "Stparitet gewann das Finale mit +3000 in einem ₽6000-Pool — der größte Einzel-Game-Payday in S3", es: "Stparitet ganó la final con +3000 en un pozo de ₽6000: el mayor premio por juego individual en S3" },
+                { en: "Derupo hit rock bottom: -4000 for the season, his worst performance in any season", ru: "Derupo достиг дна: -4000 за сезон, его худший результат за все сезоны", de: "Derupo erreichte den Tiefpunkt: -4000 in der Saison, seine schlechteste Leistung überhaupt", es: "Derupo tocó fondo: -4000 en la temporada, su peor rendimiento en cualquier temporada" },
+                { en: "Derupo lost money in 5 of 7 games — only winning Game 2 (+1500)", ru: "Derupo проиграл деньги в 5 из 7 игр — выиграл только Игру 2 (+1500)", de: "Derupo verlor in 5 von 7 Spielen Geld — gewann nur Spiel 2 (+1500)", es: "Derupo perdió dinero en 5 de 7 juegos; solo ganó el Juego 2 (+1500)" },
+                { en: "The season marked a 'RENAMING & REBRANDING' — the tournament evolved", ru: "Сезон стал моментом 'RENAMING & REBRANDING' — турнир эволюционировал", de: "Die Saison markierte ein 'RENAMING & REBRANDING' — das Turnier entwickelte sich weiter", es: "La temporada marcó un 'RENAMING & REBRANDING': el torneo evolucionó" },
+                { en: "Despite the pandemic break, players came back with higher buy-ins (₽500 vs previous ₽300-400 norm)", ru: "Несмотря на паузу из-за пандемии, игроки вернулись с более высокими buy-in (₽500 против прежней нормы ₽300-400)", de: "Trotz Pandemiepause kamen die Spieler mit höheren Buy-ins zurück (₽500 statt der früheren Norm von ₽300-400)", es: "A pesar de la pausa por pandemia, los jugadores regresaron con buy-ins más altos (₽500 vs la norma previa de ₽300-400)" },
+                { en: "Stparitet never finished 4th in any S3 game — solid consistency across all 7 games", ru: "Stparitet ни разу не финишировал 4-м ни в одной игре S3 — железная стабильность на дистанции 7 игр", de: "Stparitet wurde in keinem S3-Spiel Vierter — starke Konstanz über alle 7 Spiele", es: "Stparitet nunca terminó 4.º en ningún juego de S3: consistencia sólida en los 7 juegos" },
+                { en: "Game 4 saw TheGod's largest single win: +2000 in a ₽3000 pool — claiming 67% of the pot", ru: "В Игре 4 TheGod оформил свой крупнейший разовый выигрыш: +2000 в банке ₽3000 — 67% пота", de: "In Spiel 4 holte TheGod seinen größten Einzelsieg: +2000 in einem ₽3000-Pool — 67% des Pots", es: "En el Juego 4, TheGod logró su mayor victoria individual: +2000 en un pozo de ₽3000 (67% del pozo)" },
+                { en: "Total prize pool matched Season 1 at ₽22,500 despite having 2 fewer games", ru: "Общий призовой фонд сравнялся с Сезоном 1 — ₽22,500, несмотря на 2 игры меньше", de: "Der Gesamtpreispool entsprach mit ₽22.500 dem von Saison 1, trotz 2 Spielen weniger", es: "El pozo total igualó al de la Temporada 1 con ₽22,500 pese a tener 2 juegos menos" },
+                { en: "The 3-day sprint finish (Games 5-6-7 in June 2022) was the fastest season conclusion", ru: "Финишный спринт за 3 дня (Игры 5-6-7 в June 2022) стал самым быстрым завершением сезона", de: "Der 3-Tage-Sprint am Ende (Spiele 5-6-7 im June 2022) war der schnellste Saisonabschluss", es: "El sprint final de 3 días (Juegos 5-6-7 en June 2022) fue el cierre de temporada más rápido" },
+                { en: "Safdenz's defensive play: finished 3rd overall with only -500, minimizing damage after his S1 glory days", ru: "Оборонительный стиль Safdenz: 3-е место в общем зачёте с всего -500, минимизация ущерба после славы S1", de: "Safdenz' defensives Spiel: Gesamtplatz 3 mit nur -500, minimale Schäden nach seinen S1-Glory-Days", es: "Juego defensivo de Safdenz: terminó 3.º global con solo -500, minimizando daño tras sus días de gloria en S1" },
+              ],
+            },
+            {
+              number: 4,
+              name: { en: "Season 4 — The New Era", ru: "Сезон 4 — Новая эра", de: "Saison 4 — Die neue Ära", es: "Temporada 4 — La Nueva Era" },
+              period: { en: "September 2022", ru: "Сентябрь 2022", de: "September 2022", es: "Septiembre 2022" },
+              gameCount: 1,
+              totalPrizePool: 4000,
+              champion: "stparitet",
+              goldenFish: null,
+              standings: [
+                { player: "stparitet", place: 1, money: 2000, rebuys: 0 },
+                { player: "safdenz", place: 2, money: 0, rebuys: 0 },
+                { player: "thegod", place: 3, money: -1000, rebuys: 0 },
+                { player: "derupo", place: 4, money: -1000, rebuys: 0 },
+              ],
+              games: [
+                { number: 1, date: "03.09.2022", buyIn: 1000, rebuys: 0, totalPool: 4000, results: { derupo: -1000, stparitet: 2000, safdenz: 0, thegod: -1000 }, places: { "1st": "stparitet", "2nd": "safdenz", "3rd": "thegod", "4th": "derupo" } },
+              ],
+              insights: [
+                { en: "Season 4 was the shortest in HSP history — just 1 game played with a massive ₽1000 buy-in", ru: "Сезон 4 стал самым коротким в истории HSP — всего 1 игра с массивным buy-in ₽1000", de: "Saison 4 war die kürzeste der HSP-Geschichte — nur 1 Spiel mit einem massiven ₽1000 Buy-in", es: "La Temporada 4 fue la más corta en la historia de HSP: solo 1 juego con un buy-in masivo de ₽1000" },
+                { en: "Stparitet won his second consecutive season (S3 & S4), cementing his era of dominance", ru: "Stparitet выиграл второй сезон подряд (S3 и S4), окончательно закрепив свою эпоху доминирования", de: "Stparitet gewann seine zweite Saison in Folge (S3 und S4) und zementierte damit seine Ära der Dominanz", es: "Stparitet ganó su segunda temporada consecutiva (S3 y S4), consolidando su era de dominio" },
+                { en: "Zero rebuys from ALL players — the cleanest game in tournament history", ru: "Zero rebuys у ВСЕХ игроков — самая чистая игра в истории турнира", de: "Zero Rebuys von ALLEN Spielern — das sauberste Spiel der Turniergeschichte", es: "Zero rebuys de TODOS los jugadores: el juego más limpio en la historia del torneo" },
+                { en: "₽4000 total pool from a single game — the highest per-game pool ever", ru: "Общий банк ₽4000 в одной игре — самый высокий per-game pool за всё время", de: "₽4000 Gesamtpool aus einem einzigen Spiel — der höchste Per-Game-Pool aller Zeiten", es: "Pozo total de ₽4000 en un solo juego: el mayor pozo por juego de la historia" },
+                { en: "The ₽1000 buy-in signaled a new era of high-stakes poker", ru: "Buy-in ₽1000 обозначил новую эру high-stakes покера", de: "Das ₽1000 Buy-in signalisierte eine neue Ära des High-Stakes-Pokers", es: "El buy-in de ₽1000 señaló una nueva era de póker high-stakes" },
+                { en: "Stparitet's +2000 win gave him the best ₽/game ratio of any season", ru: "Победа Stparitet на +2000 дала ему лучший коэффициент ₽/игра среди всех сезонов", de: "Stparitets +2000-Sieg brachte ihm das beste ₽/Spiel-Verhältnis aller Saisons", es: "La victoria de +2000 de Stparitet le dio la mejor relación ₽/juego de cualquier temporada" },
+                { en: "Derupo's curse continued: 4th place yet again, extending his record to 12 total last-place finishes", ru: "Проклятие Derupo продолжилось: снова 4-е место, а его рекорд вырос до 12 последних мест", de: "Derupos Fluch ging weiter: wieder Platz 4, damit stieg sein Rekord auf 12 letzte Plätze", es: "La maldición de Derupo continuó: otro 4.º lugar, ampliando su récord a 12 últimos puestos" },
+                { en: "Safdenz played perfectly defensive poker — breaking even at ₽0 against a ₽1000 buy-in", ru: "Safdenz сыграл идеально в обороне — вышел в ₽0 при buy-in ₽1000", de: "Safdenz spielte perfekt defensives Poker — Break-even bei ₽0 trotz ₽1000 Buy-in", es: "Safdenz jugó un póker defensivo perfecto: terminó en ₽0 frente a un buy-in de ₽1000" },
+                { en: "TheGod, the Season 2 champion, couldn't recapture his magic — finishing 3rd", ru: "TheGod, чемпион Сезона 2, не смог вернуть магию — финишировал 3-м", de: "TheGod, der Champion aus Saison 2, konnte seine Magie nicht zurückholen und wurde Dritter", es: "TheGod, campeón de la Temporada 2, no pudo recuperar su magia y terminó 3.º" },
+                { en: "The New Era: buy-ins doubled from the S1 average (₽444→₽1000) — the game grew up", ru: "Новая эра: buy-in выросли вдвое относительно среднего S1 (₽444→₽1000) — игра повзрослела", de: "Die Neue Ära: Buy-ins verdoppelten sich vom S1-Durchschnitt (₽444→₽1000) — das Spiel wurde erwachsen", es: "La Nueva Era: los buy-ins se duplicaron respecto al promedio de S1 (₽444→₽1000), el juego maduró" },
+                { en: "Stparitet's winning streak: the last 2 consecutive seasons belonged to him", ru: "Победная серия Stparitet: последние 2 сезона подряд принадлежат ему", de: "Stparitets Siegesserie: die letzten 2 Saisons in Folge gehörten ihm", es: "Racha ganadora de Stparitet: las últimas 2 temporadas consecutivas fueron suyas" },
+                { en: "The game's evolution: from ₽300 buy-ins in 2018 to ₽1000 in 2022 — a 233% increase", ru: "Эволюция игры: от buy-in ₽300 в 2018 до ₽1000 в 2022 — рост на 233%", de: "Die Entwicklung des Spiels: von ₽300 Buy-ins in 2018 auf ₽1000 in 2022 — ein Anstieg um 233%", es: "Evolución del juego: de buy-ins de ₽300 en 2018 a ₽1000 en 2022, un aumento del 233%" },
+                { en: "Despite playing just 1 game, Season 4 generated 5.8% of all-time prize money", ru: "Несмотря на всего 1 игру, Сезон 4 сгенерировал 5.8% всех призовых за всю историю", de: "Obwohl nur 1 Spiel gespielt wurde, erzeugte Saison 4 5,8% des All-Time-Preisgeldes", es: "A pesar de jugar solo 1 partida, la Temporada 4 generó el 5.8% del dinero total histórico en premios" },
+                { en: "Stparitet entered the game as King of Poker and left confirming it — back-to-back champions", ru: "Stparitet вошёл в игру Королём Покера и вышел, подтвердив это — два чемпионства подряд", de: "Stparitet ging als King of Poker ins Spiel und verließ es mit der Bestätigung — Back-to-back-Champion", es: "Stparitet entró como King of Poker y salió confirmándolo: campeón back-to-back" },
+                { en: "Only 4 players, 1 game, no rebuys — the purest form of poker the HSP table ever hosted", ru: "Только 4 игрока, 1 игра, без ребаев — самая чистая форма покера, которую видел стол HSP", de: "Nur 4 Spieler, 1 Spiel, keine Rebuys — die reinste Form von Poker, die der HSP-Tisch je gesehen hat", es: "Solo 4 jugadores, 1 juego y sin rebuys: la forma más pura de póker que alojó la mesa HSP" },
+              ],
+            },
+          ],
+          playerBiographies: {
+            stparitet: {
+              title: { en: "The Machine", ru: "Машина", de: "Die Maschine", es: "La Máquina" },
+              bio: {
+                en: `Stparitet is the undisputed dynasty builder of HSP Grand Prix. Known among the table as "The Machine" for his mechanical consistency, he rose from a modest 2nd-place Season 1 finish to become the most dominant force the tournament has ever seen.\n\nHis playstyle is a masterclass in patience and calculated aggression. While others chase big pots and dramatic all-ins, Stparitet waits — studying his opponents, counting the odds, and striking when the table least expects it. He rarely makes the headline play, but he always makes the right play.\n\nSeason 1 saw him burst onto the scene with back-to-back wins in Games 1 and 2 (+1650, +1225), only to endure a brutal mid-season slump. But he absorbed the losses without tilting, finishing the season with a quiet +300 — a testament to his emotional resilience.\n\nSeason 2 was a transitional year, ending 3rd with -275. But behind the modest results, he was evolving. His game was tightening, his reads were sharpening, and by Season 3, The Machine was fully operational.\n\nSeason 3 was his coronation. With +4500, three 1st-place finishes, and never once finishing last, Stparitet announced himself as the King of the Poker table. His finale victory (+3000 in a ₽6000 pot) was surgical — dismantling opponents with precision betting and perfectly timed aggression.\n\nSeason 4 confirmed what everyone already knew: this was his era. A clean +2000 win with zero rebuys. Back-to-back season championships (S3 & S4) and King of Poker (S2-S3). The all-time money leader at +6525.\n\nHis nickname in the data — "ai" — is eerily fitting. Stparitet plays like an algorithm: unemotional, relentless, always optimizing. He has 12 rebuys across all seasons — the most of any player — but his rebuy-to-profit ratio makes every second chance pay off. He is proof that in poker, survival is the first skill and dominance is the final one.\n\nCareer Stats: 26 games, 9 wins (35%), +6525 total, King of Poker S2-S3, back-to-back season champion S3-S4.`,
+                ru: `Stparitet — бесспорный архитектор династии HSP Grand Prix. За механическую стабильность за столом его называют "Машиной": он прошёл путь от скромного 2-го места в Сезоне 1 до самой доминирующей силы, которую когда-либо видел турнир.\n\nЕго стиль — эталон терпения и просчитанной агрессии. Пока другие охотятся за крупными потами и драматичными all-in, Stparitet выжидает: изучает соперников, считает шансы и наносит удар тогда, когда стол меньше всего этого ждёт. Он редко делает хайлайт-ход, но почти всегда делает правильный ход.\n\nВ Сезоне 1 он ворвался в турнир двумя победами подряд в Играх 1 и 2 (+1650, +1225), а затем пережил жёсткий спад в середине дистанции. Но он принял убытки без тильта и завершил сезон с аккуратными +300 — показатель психологической устойчивости.\n\nСезон 2 стал переходным: 3-е место и -275. Но за скромным результатом шла эволюция. Его игра становилась плотнее, риды точнее, и к Сезону 3 Машина вышла на полную мощность.\n\nСезон 3 стал его коронацией. +4500, три первых места и ни одного финиша последним — Stparitet официально объявил себя Королём покерного стола. Победа в финале (+3000 в поте ₽6000) была хирургически точной: он разобрал соперников прецизионными ставками и идеально выверенным таймингом агрессии.\n\nСезон 4 подтвердил то, что все уже знали: это его эпоха. Чистая победа +2000 с нулём ребаев. Два чемпионства подряд (S3 и S4) и статус King of Poker (S2-S3). Лидер по суммарным призовым за всё время: +6525.\n\nЕго ник в данных — "ai" — пугающе точен. Stparitet играет как алгоритм: без эмоций, без пауз, с постоянной оптимизацией. У него 12 ребаев за все сезоны — больше всех — но его коэффициент rebuy-to-profit делает каждую вторую попытку окупаемой. Он доказывает: в покере первый навык — выживание, финальный — доминирование.\n\nКарьерная статистика: 26 игр, 9 побед (35%), +6525 total, King of Poker S2-S3, back-to-back season champion S3-S4.`,
+                de: `Stparitet ist der unbestrittene Dynastie-Bauer des HSP Grand Prix. Am Tisch ist er als "Die Maschine" bekannt, wegen seiner mechanischen Konstanz: von einem soliden 2. Platz in Saison 1 entwickelte er sich zur dominantesten Kraft, die das Turnier je gesehen hat.\n\nSein Playstyle ist eine Meisterklasse in Geduld und kalkulierter Aggression. Während andere große Pots und dramatische All-ins jagen, wartet Stparitet — er studiert Gegner, zählt Odds und schlägt zu, wenn der Tisch es am wenigsten erwartet. Er macht selten den Highlight-Play, aber fast immer den richtigen Play.\n\nIn Saison 1 explodierte er mit Back-to-back-Siegen in Spiel 1 und 2 (+1650, +1225), nur um danach in ein brutales Mid-Season-Tief zu fallen. Doch er absorbierte die Verluste ohne Tilt und beendete die Saison mit ruhigen +300 — ein Beweis seiner mentalen Stabilität.\n\nSaison 2 war ein Übergangsjahr, Platz 3 mit -275. Hinter den nüchternen Zahlen entwickelte er sich jedoch weiter. Sein Game wurde tighter, seine Reads schärfer, und in Saison 3 lief die Maschine auf voller Leistung.\n\nSaison 3 war seine Krönung. Mit +4500, drei ersten Plätzen und keinem einzigen letzten Platz erklärte Stparitet sich zum King of the Poker table. Sein Finalsieg (+3000 in einem ₽6000-Pot) war chirurgisch: Gegner zerlegt durch präzises Betting und perfekt getimte Aggression.\n\nSaison 4 bestätigte, was ohnehin klar war: Das war seine Ära. Ein sauberer +2000-Sieg bei null Rebuys. Back-to-back Saison-Championships (S3 & S4) und King of Poker (S2-S3). All-Time-Money-Leader mit +6525.\n\nSein Nickname in den Daten — "ai" — passt unheimlich gut. Stparitet spielt wie ein Algorithmus: emotionslos, unaufhaltsam, permanent optimierend. Er hat 12 Rebuys über alle Saisons — die meisten aller Spieler — doch sein Rebuy-to-Profit-Verhältnis macht jede zweite Chance profitabel. Er beweist: Im Poker ist Überleben die erste Fähigkeit, Dominanz die letzte.\n\nCareer Stats: 26 Spiele, 9 Siege (35%), +6525 total, King of Poker S2-S3, back-to-back season champion S3-S4.`,
+                es: `Stparitet es el constructor de dinastías indiscutible del HSP Grand Prix. En la mesa lo conocen como "La Máquina" por su consistencia mecánica: pasó de un discreto 2.º lugar en la Temporada 1 a convertirse en la fuerza más dominante que ha visto el torneo.\n\nSu estilo de juego es una clase magistral de paciencia y agresión calculada. Mientras otros persiguen pozos enormes y all-ins dramáticos, Stparitet espera: estudia rivales, cuenta odds y golpea cuando la mesa menos lo espera. Rara vez hace la jugada de portada, pero casi siempre hace la jugada correcta.\n\nLa Temporada 1 lo vio irrumpir con victorias back-to-back en los Juegos 1 y 2 (+1650, +1225), solo para sufrir luego un duro bajón de mitad de temporada. Pero absorbió las pérdidas sin tilt y cerró con un +300 silencioso, prueba de su resiliencia emocional.\n\nLa Temporada 2 fue de transición: terminó 3.º con -275. Pero detrás de ese resultado modesto estaba evolucionando. Su juego se volvió más tight, sus lecturas más filosas, y para la Temporada 3 la Máquina ya operaba al máximo.\n\nLa Temporada 3 fue su coronación. Con +4500, tres primeros puestos y sin terminar último ni una vez, Stparitet se proclamó King of the Poker table. Su victoria final (+3000 en un pozo de ₽6000) fue quirúrgica: desarmó a sus rivales con apuestas de precisión y agresión perfectamente temporizada.\n\nLa Temporada 4 confirmó lo que todos ya sabían: era su era. Victoria limpia de +2000 con cero rebuys. Campeonatos de temporada back-to-back (S3 y S4) y King of Poker (S2-S3). Líder histórico de ganancias con +6525.\n\nSu apodo en los datos — "ai" — le queda inquietantemente bien. Stparitet juega como un algoritmo: sin emoción, implacable, siempre optimizando. Tiene 12 rebuys en todas las temporadas — el máximo de cualquier jugador — pero su relación rebuy-to-profit hace que cada segunda oportunidad pague. Es la prueba de que en póker la primera habilidad es sobrevivir y la final es dominar.\n\nCareer Stats: 26 juegos, 9 victorias (35%), +6525 total, King of Poker S2-S3, back-to-back season champion S3-S4.`
+              },
+            },
+            safdenz: {
+              title: { en: "The Natural", ru: "Талант", de: "Das Naturtalent", es: "El Natural" },
+              bio: {
+                en: `Safdenz is the most enigmatic player in HSP Grand Prix history. He burst onto the scene with a Season 1 performance so dominant that it may never be equaled — and then slowly, deliberately, faded into the role of a careful survivor.\n\nSeason 1 Safdenz was a force of nature. Four first-place finishes in nine games. A 4-game winning streak (Games 3-6) that remains the longest in HSP history. A total of +6600 in earnings. And the most remarkable stat of all: just 1 rebuy in the entire season. While his opponents were burning through their bankrolls and rebuying 5 times each, Safdenz played with the discipline of a veteran twice his age.\n\nThey called him "The Natural" because it all looked effortless. He'd sit at the table, read the room, and make moves that seemed obvious in hindsight but impossible to predict in the moment. His Game 3 and 4 wins (back-to-back +2200 and +2250) were masterpieces of aggressive poker.\n\nBut then something shifted. Season 2 saw Safdenz finish 2nd with -175 — still competitive, still dangerous, but no longer the dominant force. By Season 3, he was a survivor, finishing 3rd at -500. The fire that drove his Season 1 rampage seemed to settle into a controlled burn.\n\nWhat makes Safdenz fascinating is what didn't change: his discipline. Across 26 games, he had only 7 total rebuys — the fewest of any player. Even in his "decline," he never devolved into reckless play. He simply became more selective, more defensive, more patient.\n\nThe numbers tell a story of a player who peaked early and found peace with it. His all-time +5925 makes him the second-highest earner in HSP history. His 9 first-place finishes (tied with Stparitet) prove he could still win when he chose to compete at full intensity.\n\nThe King of Poker title for S1-S2 is his forever. Safdenz was the first true champion of the HSP Grand Prix, and no amount of time can take that away.\n\nCareer Stats: 26 games, 9 wins (35%), +5925 total, King of Poker S1-S2, fewest rebuys all-time (7).`,
+                ru: `Safdenz — самый загадочный игрок в истории HSP Grand Prix. Он ворвался в лигу с таким доминированием в Сезоне 1, что повторить это может быть уже невозможно, а затем медленно и осознанно перешёл в роль аккуратного выживальщика.\n\nSafdenz в Сезоне 1 был природной стихией. Четыре первых места в девяти играх. Победная серия из 4 игр подряд (Игры 3-6), которая до сих пор остаётся самой длинной в истории HSP. Суммарно +6600. И самый поразительный факт: всего 1 ребай за весь сезон. Пока соперники сжигали банкроллы и делали по 5 ребаев каждый, Safdenz играл с дисциплиной ветерана вдвое старше себя.\n\nЕго называли "Талантом" потому, что всё выглядело effortless. Он садился за стол, считывал комнату и принимал решения, которые задним числом казались очевидными, но в моменте были непредсказуемыми. Победы в Играх 3 и 4 (back-to-back +2200 и +2250) были шедеврами агрессивного покера.\n\nНо затем что-то изменилось. В Сезоне 2 Safdenz занял 2-е место с -175 — всё ещё конкурентный и опасный, но уже не прежняя доминирующая сила. К Сезону 3 он стал игроком на выживание и финишировал 3-м с -500. Огонь, который нёс его через разгром в S1, превратился в контролируемое тление.\n\nВ Safdenz особенно интересно то, что не изменилось: дисциплина. За 26 игр у него всего 7 ребаев — минимум среди всех игроков. Даже в период "спада" он не уходил в безрассудство. Он стал более выборочным, более защитным, более терпеливым.\n\nЦифры рассказывают историю игрока, который рано вышел на пик и принял это. Его +5925 за всё время — второй результат в истории HSP. А 9 первых мест (поровну со Stparitet) доказывают: когда он выбирал играть на полной мощности, он всё ещё мог забирать турнир.\n\nТитул King of Poker за S1-S2 останется с ним навсегда. Safdenz был первым настоящим чемпионом HSP Grand Prix, и никакое время этого не отнимет.\n\nКарьерная статистика: 26 игр, 9 побед (35%), +5925 total, King of Poker S1-S2, fewest rebuys all-time (7).`,
+                de: `Safdenz ist der rätselhafteste Spieler der HSP-Grand-Prix-Geschichte. Er platzte mit einer derart dominanten Saison-1-Performance auf die Bühne, dass sie vielleicht nie übertroffen wird — und glitt dann langsam, bewusst in die Rolle eines vorsichtigen Survivors.\n\nSafdenz in Saison 1 war eine Naturgewalt. Vier erste Plätze in neun Spielen. Eine 4-Spiele-Siegesserie (Spiele 3-6), bis heute die längste der HSP-Historie. Insgesamt +6600 an Earnings. Und die bemerkenswerteste Zahl: nur 1 Rebuy in der gesamten Saison. Während seine Gegner ihre Bankrolls verbrannten und jeweils 5-mal nachkauften, spielte Safdenz mit der Disziplin eines doppelt so alten Veterans.\n\nSie nannten ihn "Das Naturtalent", weil alles mühelos aussah. Er setzte sich an den Tisch, las den Raum und machte Moves, die im Nachhinein offensichtlich wirkten, im Moment aber unmöglich vorherzusagen waren. Seine Siege in Spiel 3 und 4 (back-to-back +2200 und +2250) waren Meisterwerke aggressiven Pokers.\n\nDann kippte etwas. In Saison 2 wurde Safdenz Zweiter mit -175 — weiterhin konkurrenzfähig, weiterhin gefährlich, aber nicht mehr die dominante Kraft. In Saison 3 war er ein Survivor, Platz 3 mit -500. Das Feuer seines S1-Rampage ging in ein kontrolliertes Glühen über.\n\nFaszinierend ist, was sich nicht veränderte: seine Disziplin. Über 26 Spiele hatte er nur 7 Rebuys — die wenigsten aller Spieler. Selbst in seinem "Rückgang" verfiel er nie in recklesses Spiel. Er wurde einfach selektiver, defensiver, geduldiger.\n\nDie Zahlen erzählen von einem Spieler, der früh peakte und Frieden damit fand. Seine All-Time +5925 machen ihn zum zweitgrößten Earner der HSP-Historie. Seine 9 ersten Plätze (gleichauf mit Stparitet) beweisen, dass er weiterhin gewinnen konnte, wenn er mit voller Intensität spielte.\n\nDer King-of-Poker-Titel für S1-S2 gehört ihm für immer. Safdenz war der erste echte Champion des HSP Grand Prix, und keine Zeit der Welt nimmt ihm das weg.\n\nCareer Stats: 26 Spiele, 9 Siege (35%), +5925 total, King of Poker S1-S2, fewest rebuys all-time (7).`,
+                es: `Safdenz es el jugador más enigmático en la historia del HSP Grand Prix. Irrumpió con una actuación en la Temporada 1 tan dominante que quizá jamás se iguale, y luego, lenta y deliberadamente, se fue transformando en un sobreviviente cuidadoso.\n\nEl Safdenz de la Temporada 1 fue una fuerza de la naturaleza. Cuatro primeros lugares en nueve juegos. Una racha de 4 victorias (Juegos 3-6) que sigue siendo la más larga en la historia de HSP. Un total de +6600 en ganancias. Y el dato más notable de todos: solo 1 rebuy en toda la temporada. Mientras sus rivales quemaban bankroll y hacían 5 rebuys cada uno, Safdenz jugó con la disciplina de un veterano que le doblaba la edad.\n\nLe decían "El Natural" porque todo parecía effortless. Se sentaba en la mesa, leía la sala y hacía movimientos que en retrospectiva parecían obvios, pero en el momento eran imposibles de anticipar. Sus triunfos en Juegos 3 y 4 (back-to-back +2200 y +2250) fueron obras maestras de póker agresivo.\n\nPero algo cambió. En la Temporada 2 terminó 2.º con -175: seguía competitivo, seguía peligroso, pero ya no era la fuerza dominante. Para la Temporada 3 era un sobreviviente, 3.º con -500. El fuego que impulsó su arrasadora S1 pareció convertirse en una combustión controlada.\n\nLo fascinante de Safdenz es lo que no cambió: su disciplina. En 26 juegos, hizo solo 7 rebuys, el menor número de todos. Incluso en su "declive", nunca cayó en juego reckless. Simplemente se volvió más selectivo, más defensivo y más paciente.\n\nLos números cuentan la historia de un jugador que alcanzó su pico temprano y encontró paz con eso. Su +5925 histórico lo convierte en el segundo máximo ganador en la historia de HSP. Sus 9 primeros lugares (empatado con Stparitet) prueban que todavía podía ganar cuando elegía competir a máxima intensidad.\n\nEl título de King of Poker en S1-S2 es suyo para siempre. Safdenz fue el primer campeón real del HSP Grand Prix, y el tiempo no puede quitarle eso.\n\nCareer Stats: 26 juegos, 9 victorias (35%), +5925 total, King of Poker S1-S2, fewest rebuys all-time (7).`
+              },
+            },
+            derupo: {
+              title: { en: "The Underdog", ru: "Андердог", de: "Der Underdog", es: "El Desvalido" },
+              bio: {
+                en: `Derupo is the heart and soul of the HSP Grand Prix. Every poker table needs a player who refuses to give up, who comes back session after session despite the odds, who makes every victory feel earned and every defeat feel like fuel. That player is Derupo.\n\nThe numbers are brutal and honest: -8725 all-time, 12 fourth-place finishes (the most of anyone), and only 4 wins in 26 games. In any other context, these would be the stats of someone who should have quit long ago. But Derupo's story isn't about the numbers — it's about the fight.\n\nSeason 1 set the pattern. He finished 3rd at -1950, struggling through 5 rebuys, often finding himself on the wrong side of big pots. But then came Game 9 — the ₽1000 buy-in finale — and Derupo won it. Not by a small margin. He won +2250, the largest single-game haul of the season. It was a statement: I'm still here.\n\nSeason 2 saw him win Games 2 and 3 back-to-back early in the season, showing flashes of the player he could be. But consistency remained elusive, and he finished 4th at -1775.\n\nSeason 3 was his darkest chapter. -4000 total, with only one win (Game 2, +1500). The 2-year pandemic break seemed to reset everyone except Derupo, who came back to the higher-stakes table and found it unforgiving.\n\nSeason 4 brought no mercy: 4th place again in the single ₽1000 game.\n\nBut here's what the stats don't capture: Derupo is the player everyone respects. He plays with passion, takes risks that others wouldn't dare, and creates the action that makes HSP Grand Prix exciting. His 12 rebuys (tied with Stparitet for the most) show a player who believes every hand could turn the tide.\n\nThe Derupo Special is a thing of legend — going deep in the red all game, then pulling off an impossible comeback in the final hand. He doesn't always pull it off, but when he does, it's the best moment at the table.\n\nAt -8725, Derupo has funded a significant portion of the prize pool. In a very real sense, his losses made other players' victories possible. He is the engine that keeps the HSP Grand Prix running. And he'll be back.\n\nCareer Stats: 26 games, 4 wins (15%), -8725 total, 12 last-place finishes, most dramatic finales.`,
+                ru: `Derupo — сердце и душа HSP Grand Prix. Каждому покерному столу нужен игрок, который отказывается сдаваться, возвращается сессия за сессией вопреки шансам, делает каждую победу заслуженной, а каждое поражение — топливом. Этот игрок — Derupo.\n\nЦифры беспощадны и честны: -8725 за всё время, 12 финишей на 4-м месте (больше всех), и лишь 4 победы в 26 играх. В любом другом контексте это статистика человека, который должен был давно уйти. Но история Derupo не о цифрах — она о борьбе.\n\nСезон 1 задал шаблон. Он финишировал 3-м с -1950, пережив 5 ребаев и часто оказываясь по неправильную сторону больших банков. Но затем пришла Игра 9 — финал с buy-in ₽1000 — и Derupo её забрал. Не на тоненького. Он взял +2250, крупнейший разовый выигрыш сезона. Это было заявление: я всё ещё здесь.\n\nВ Сезоне 2 он выиграл Игры 2 и 3 подряд в начале дистанции, показав вспышки того игрока, которым мог бы быть. Но стабильность оставалась недостижимой, и сезон он закрыл 4-м с -1775.\n\nСезон 3 стал его самым тёмным отрезком. -4000 суммарно, при единственной победе (Игра 2, +1500). Двухлетняя пауза из-за пандемии будто перезапустила всех, кроме Derupo: он вернулся за более дорогой стол и столкнулся с безжалостной реальностью.\n\nСезон 4 не дал пощады: снова 4-е место в единственной игре с buy-in ₽1000.\n\nНо вот чего не показывает статистика: Derupo — игрок, которого уважают все. Он играет с огнём, берёт риски, на которые другие не решаются, и создаёт тот экшен, из-за которого HSP Grand Prix хочется смотреть. Его 12 ребаев (поровну со Stparitet, максимум) показывают игрока, который верит: любая раздача может перевернуть ход игры.\n\nDerupo Special — уже легенда: весь матч глубоко в красной зоне, а затем невозможный камбэк в последней раздаче. Получается не всегда, но когда получается — это лучший момент вечера.\n\nС результатом -8725 Derupo профинансировал значительную часть призового фонда. В очень прямом смысле его потери сделали возможными победы других. Он — двигатель, который поддерживает HSP Grand Prix в движении. И он вернётся.\n\nКарьерная статистика: 26 игр, 4 победы (15%), -8725 total, 12 last-place finishes, most dramatic finales.`,
+                de: `Derupo ist Herz und Seele des HSP Grand Prix. Jeder Pokertisch braucht einen Spieler, der nicht aufgibt, der Session für Session trotz aller Odds zurückkommt, der jeden Sieg verdient wirken lässt und jede Niederlage in Treibstoff verwandelt. Dieser Spieler ist Derupo.\n\nDie Zahlen sind brutal und ehrlich: -8725 all-time, 12 vierte Plätze (mehr als jeder andere) und nur 4 Siege in 26 Spielen. In jedem anderen Kontext wären das die Stats von jemandem, der längst aufgehört hätte. Doch Derupos Story handelt nicht von Zahlen — sie handelt vom Kampf.\n\nSaison 1 setzte das Muster. Platz 3 mit -1950, 5 Rebuys, häufig auf der falschen Seite großer Pots. Dann kam Spiel 9 — das ₽1000-Buy-in-Finale — und Derupo gewann. Nicht knapp. Er holte +2250, den größten Single-Game-Haul der Saison. Ein Statement: Ich bin noch da.\n\nIn Saison 2 gewann er früh Spiel 2 und 3 back-to-back und zeigte, was in ihm steckt. Doch Konstanz blieb schwer greifbar, und er endete auf Platz 4 mit -1775.\n\nSaison 3 war sein dunkelstes Kapitel. -4000 total, mit nur einem Sieg (Spiel 2, +1500). Die 2-jährige Pandemiepause schien alle zu resetten — außer Derupo, der an den High-Stakes-Tisch zurückkehrte und ihn unerbittlich fand.\n\nSaison 4 brachte keine Gnade: wieder Platz 4 im einzigen ₽1000-Spiel.\n\nDoch was die Stats nicht zeigen: Derupo ist der Spieler, den alle respektieren. Er spielt mit Leidenschaft, nimmt Risiken, die sonst keiner nimmt, und erzeugt die Action, die den HSP Grand Prix spannend macht. Seine 12 Rebuys (gleichauf mit Stparitet, die meisten) zeigen einen Spieler, der glaubt, dass jede Hand das Blatt wenden kann.\n\nDas Derupo Special ist legendär — das ganze Spiel tief im Roten, dann ein unmögliches Comeback in der letzten Hand. Es klappt nicht immer, aber wenn es klappt, ist es der beste Moment am Tisch.\n\nMit -8725 hat Derupo einen beträchtlichen Teil des Preispools finanziert. In sehr realem Sinn haben seine Verluste die Siege der anderen ermöglicht. Er ist der Motor, der den HSP Grand Prix am Laufen hält. Und er kommt zurück.\n\nCareer Stats: 26 Spiele, 4 Siege (15%), -8725 total, 12 last-place finishes, most dramatic finales.`,
+                es: `Derupo es el corazón y el alma del HSP Grand Prix. Toda mesa de póker necesita a un jugador que se niegue a rendirse, que vuelva sesión tras sesión pese a las probabilidades, que haga que cada victoria se sienta ganada y cada derrota se convierta en combustible. Ese jugador es Derupo.\n\nLos números son brutales y honestos: -8725 histórico, 12 cuartos lugares (el máximo de todos) y solo 4 victorias en 26 juegos. En cualquier otro contexto, serían los stats de alguien que debería haber abandonado hace mucho. Pero la historia de Derupo no trata de números; trata de lucha.\n\nLa Temporada 1 marcó el patrón. Terminó 3.º con -1950, sufriendo 5 rebuys y quedando a menudo del lado incorrecto de los grandes pozos. Pero luego llegó el Juego 9 — la final con buy-in de ₽1000 — y Derupo la ganó. No por poco. Ganó +2250, la mayor ganancia de una sola partida en la temporada. Fue una declaración: sigo aquí.\n\nEn la Temporada 2 ganó los Juegos 2 y 3 back-to-back al inicio, mostrando destellos del jugador que podía ser. Pero la consistencia siguió esquiva y terminó 4.º con -1775.\n\nLa Temporada 3 fue su capítulo más oscuro. -4000 total, con una sola victoria (Juego 2, +1500). El parón pandémico de 2 años pareció resetear a todos excepto a Derupo, que volvió a una mesa de stakes más altos y la encontró implacable.\n\nLa Temporada 4 no tuvo piedad: otra vez 4.º en el único juego de ₽1000.\n\nPero esto no lo capturan los números: Derupo es el jugador que todos respetan. Juega con pasión, toma riesgos que otros no se atreven a tomar y crea la acción que hace emocionante al HSP Grand Prix. Sus 12 rebuys (empatado con Stparitet como máximo) muestran a un jugador que cree que cualquier mano puede cambiar la marea.\n\nEl Derupo Special ya es leyenda: toda la partida en rojo profundo y luego un comeback imposible en la última mano. No siempre sale, pero cuando sale, es el mejor momento de la mesa.\n\nCon -8725, Derupo ha financiado una parte importante del pozo de premios. En un sentido muy real, sus pérdidas hicieron posibles las victorias de otros. Es el motor que mantiene vivo al HSP Grand Prix. Y volverá.\n\nCareer Stats: 26 juegos, 4 victorias (15%), -8725 total, 12 last-place finishes, most dramatic finales.`
+              },
+            },
+            thegod: {
+              title: { en: "The Strategist", ru: "Стратег", de: "Der Stratege", es: "El Estratega" },
+              bio: {
+                en: `TheGod is the most analytical mind to ever sit at the HSP Grand Prix table. His nickname might seem presumptuous until you witness his approach to the game: every decision is calculated, every bet tells a story, and every loss is catalogued for future exploitation.\n\nSeason 1 was a humbling beginning. -4950, the worst single-season result in HSP history. Five rebuys, zero dominant performances. TheGod sat fifth in a four-player field, as far from his self-appointed name as possible. Most players would have adjusted their ego. TheGod adjusted his strategy.\n\nWhat happened in Season 2 is the stuff of poker legend. The same player who hemorrhaged -4950 came back and won the championship with +2175. But it wasn't just the result — it was HOW he won. TheGod earned 15 Golden Fish points (a record that still stands), never finished 4th in any game, and won the final two games (Game 8: +1400, Game 9: +3500) to clinch the title in the most dramatic fashion possible.\n\nHis Season 2 performance revealed his true nature: TheGod is a long-game player. He studies patterns across sessions, not just hands. He tracks opponents' tendencies over months and adjusts his game to exploit weaknesses that haven't been discovered yet. His patience is his weapon.\n\nSeason 3 proved his discipline can scale. In a season with higher stakes (₽500 buy-ins), TheGod achieved something nobody thought possible: zero rebuys across all 7 games. He played so carefully, so efficiently, that he never needed a second chance. He finished at exactly ₽0 — a perfect equilibrium that masked the brilliant micro-adjustments happening at every hand.\n\nSeason 4 brought a 3rd-place finish (-1000), but by then TheGod's legacy was secure. He'd proven that poker mastery isn't about constant winning — it's about constant adaptation.\n\nHis 12 third-place finishes are the most of any player, revealing his true strategy: avoid elimination, stay competitive, and wait for the moments that matter. When those moments come, TheGod strikes.\n\nThe 3,405 minutes he spent at the table in Season 2 alone — the most of any player — tells you everything about his commitment to the game. He doesn't just play poker; he lives inside it.\n\nCareer Stats: 26 games, 4 wins (15%), -3775 total, Golden Fish S2 champion (15 pts), zero rebuys in S3.`,
+                ru: `TheGod — самый аналитичный ум, когда-либо садившийся за стол HSP Grand Prix. Его ник может показаться дерзким, пока не увидишь его подход к игре: каждое решение просчитано, каждая ставка рассказывает историю, каждое поражение фиксируется для будущей эксплуатации соперников.\n\nСезон 1 стал отрезвляющим стартом. -4950, худший результат одного сезона в истории HSP. Пять ребаев, ноль доминирующих выступлений. TheGod оказался пятым в поле из четырёх игроков — максимально далеко от собственного прозвища. Большинство в такой ситуации правили бы эго. TheGod переписал стратегию.\n\nТо, что произошло в Сезоне 2, уже легенда покера. Тот же игрок, который слил -4950, вернулся и взял чемпионство с +2175. Но важен не только результат — важно КАК он победил. TheGod набрал 15 очков Golden Fish (рекорд, который всё ещё держится), ни разу не занял 4-е место и выиграл две последние игры (Игра 8: +1400, Игра 9: +3500), оформив титул максимально драматично.\n\nЕго выступление в Сезоне 2 раскрыло истинную природу: TheGod — игрок длинной дистанции. Он изучает паттерны по сессиям, а не только по раздачам. Он отслеживает тенденции соперников месяцами и перестраивает игру так, чтобы эксплуатировать слабости, которые ещё даже не очевидны. Его оружие — терпение.\n\nСезон 3 доказал масштаб его дисциплины. В сезоне с повышенными ставками (buy-in ₽500) TheGod сделал то, что считали невозможным: zero rebuys во всех 7 играх. Он играл настолько аккуратно и эффективно, что ему ни разу не понадобился второй вход. Итог — ровно ₽0: идеальное равновесие, скрывающее блестящие микро-корректировки в каждой раздаче.\n\nСезон 4 принёс 3-е место (-1000), но к тому моменту наследие TheGod уже было закреплено. Он доказал, что покерное мастерство — это не постоянные победы, а постоянная адаптация.\n\nЕго 12 финишей на 3-м месте — максимум среди всех игроков и отражение истинной стратегии: не вылетать, оставаться в гонке, ждать правильных моментов. Когда эти моменты приходят, TheGod бьёт точно.\n\n3,405 минут за столом только в Сезоне 2 — больше любого другого игрока — говорят всё о его отношении к игре. Он не просто играет в покер; он живёт внутри него.\n\nКарьерная статистика: 26 игр, 4 победы (15%), -3775 total, Golden Fish S2 champion (15 pts), zero rebuys in S3.`,
+                de: `TheGod ist der analytischste Kopf, der je am HSP-Grand-Prix-Tisch saß. Sein Nickname wirkt vielleicht überheblich, bis man seinen Game-Approach sieht: jede Entscheidung ist kalkuliert, jede Bet erzählt eine Geschichte, und jeder Verlust wird für spätere Exploits katalogisiert.\n\nSaison 1 war ein demütigender Start. -4950, das schlechteste Einzel-Saison-Ergebnis der HSP-Historie. Fünf Rebuys, null dominante Performances. TheGod saß als Fünfter in einem Vier-Spieler-Feld — weiter weg von seinem selbstgewählten Namen ging es kaum. Die meisten hätten ihr Ego angepasst. TheGod passte seine Strategie an.\n\nWas in Saison 2 passierte, ist Poker-Legende. Derselbe Spieler, der -4950 verbrannte, kam zurück und gewann die Championship mit +2175. Und nicht nur das Resultat zählt — sondern WIE er gewann. TheGod holte 15 Golden-Fish-Punkte (ein bis heute bestehender Rekord), wurde in keinem Spiel Vierter und gewann die letzten zwei Spiele (Spiel 8: +1400, Spiel 9: +3500), um den Titel maximal dramatisch zu clinchen.\n\nSeine Saison-2-Performance zeigte seine wahre Natur: TheGod ist ein Long-Game-Spieler. Er studiert Muster über Sessions hinweg, nicht nur über einzelne Hände. Er verfolgt Gegner-Tendenzen über Monate und passt sein Game so an, dass er Schwächen exploitet, die noch gar nicht entdeckt wurden. Geduld ist seine Waffe.\n\nSaison 3 bewies, dass seine Disziplin skaliert. In einer Saison mit höheren Stakes (₽500 Buy-ins) schaffte TheGod etwas Unvorstellbares: zero Rebuys über alle 7 Spiele. Er spielte so kontrolliert und effizient, dass er nie eine zweite Chance brauchte. Er endete exakt bei ₽0 — ein perfektes Gleichgewicht, hinter dem brillante Mikro-Anpassungen in jeder Hand lagen.\n\nSaison 4 brachte Platz 3 (-1000), doch da war TheGods Vermächtnis bereits gesichert. Er hatte bewiesen, dass Poker-Mastery nicht aus konstantem Gewinnen besteht — sondern aus konstanter Anpassung.\n\nSeine 12 dritten Plätze sind die meisten aller Spieler und zeigen seine echte Strategie: nicht ausscheiden, im Rennen bleiben und auf die entscheidenden Momente warten. Wenn sie kommen, schlägt TheGod zu.\n\nDie 3.405 Minuten, die er allein in Saison 2 am Tisch verbrachte — mehr als jeder andere Spieler — sagen alles über sein Commitment. Er spielt Poker nicht nur; er lebt darin.\n\nCareer Stats: 26 Spiele, 4 Siege (15%), -3775 total, Golden Fish S2 champion (15 pts), zero rebuys in S3.`,
+                es: `TheGod es la mente más analítica que se ha sentado en la mesa del HSP Grand Prix. Su apodo puede sonar presumido hasta que ves su enfoque: cada decisión está calculada, cada apuesta cuenta una historia y cada derrota se registra para explotarla en el futuro.\n\nLa Temporada 1 fue un inicio de humildad. -4950, el peor resultado de una sola temporada en la historia de HSP. Cinco rebuys, cero actuaciones dominantes. TheGod quedó quinto en una mesa de cuatro jugadores, tan lejos como se puede de su nombre autoimpuesto. La mayoría habría ajustado el ego. TheGod ajustó la estrategia.\n\nLo que ocurrió en la Temporada 2 es leyenda de póker. El mismo jugador que sangró -4950 volvió y ganó el campeonato con +2175. Pero no fue solo el resultado: fue CÓMO ganó. TheGod sumó 15 puntos de Golden Fish (récord vigente), nunca terminó 4.º en ningún juego y ganó los dos juegos finales (Juego 8: +1400, Juego 9: +3500) para asegurar el título de la forma más dramática posible.\n\nSu desempeño en Temporada 2 reveló su verdadera naturaleza: TheGod es un jugador de largo plazo. Estudia patrones entre sesiones, no solo manos. Rastrea tendencias de rivales durante meses y ajusta su juego para explotar debilidades que aún no se han descubierto. Su arma es la paciencia.\n\nLa Temporada 3 demostró que su disciplina escala. En una temporada de stakes más altos (buy-ins de ₽500), TheGod logró lo que nadie creía posible: zero rebuys en los 7 juegos. Jugó con tanta precisión y eficiencia que nunca necesitó una segunda vida. Terminó exactamente en ₽0, un equilibrio perfecto que ocultaba microajustes brillantes en cada mano.\n\nLa Temporada 4 trajo un 3.º lugar (-1000), pero para entonces su legado ya estaba asegurado. Había demostrado que dominar el póker no trata de ganar siempre, sino de adaptarse siempre.\n\nSus 12 terceros lugares son el máximo entre todos los jugadores y revelan su estrategia real: evitar la eliminación, seguir competitivo y esperar los momentos que importan. Cuando llegan, TheGod golpea.\n\nLos 3,405 minutos que pasó en la mesa solo en la Temporada 2 — más que cualquier otro jugador — lo dicen todo sobre su compromiso. No solo juega póker; vive dentro de él.\n\nCareer Stats: 26 juegos, 4 victorias (15%), -3775 total, Golden Fish S2 champion (15 pts), zero rebuys in S3.`
+              },
+            },
+          },
+          finalResults: {
+            moneyLeaderboard: [
+              { player: "stparitet", money: 6525, rank: 1 },
+              { player: "safdenz", money: 5925, rank: 2 },
+              { player: "thegod", money: -3775, rank: 3 },
+              { player: "derupo", money: -8725, rank: 4 },
+            ],
+            kingOfPoker: [
+              { period: "Seasons 1-2", player: "safdenz" },
+              { period: "Seasons 2-3", player: "stparitet" },
+            ],
+            cumulativeResults: {
+              "S1+S2": { derupo: -3725, stparitet: 25, safdenz: 6425, thegod: -2775 },
+              "S2+S3": { derupo: -5775, stparitet: 4225, safdenz: -675, thegod: 2175 },
+              "S3+S4": { derupo: -5000, stparitet: 6500, safdenz: -500, thegod: -1000 },
+            },
+          },
+        };
+
+        // --- UTILS ---
+        const formatMoney = (amount) => {
+            if (amount > 0) return `<span class="text-win">+₽${amount}</span>`;
+            if (amount < 0) return `<span class="text-loss">-₽${Math.abs(amount)}</span>`;
+            return `<span class="text-silver">₽0</span>`;
+        };
+        
+        const getPlayer = (id) => HSP_DATA.players[id];
+        
+        const playerColors = {
+            stparitet: '#c9a84c', // gold
+            safdenz: '#2ecc71',   // green
+            derupo: '#e74c3c',    // red
+            thegod: '#3498db'     // blue
+        };
+
+        const getLocalized = (value) => {
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+                return value[currentLang] || value.en || '';
+            }
+            return value;
+        };
+
+        const destroyCharts = () => {
+            while (chartInstances.length) {
+                const chart = chartInstances.pop();
+                chart.destroy();
+            }
+        };
+
+        const renderLangButtons = () => {
+            document.querySelectorAll('.lang-btn').forEach((btn) => {
+                const isActive = btn.dataset.lang === currentLang;
+                btn.classList.toggle('bg-gold', isActive);
+                btn.classList.toggle('text-bg', isActive);
+                btn.classList.toggle('font-bold', isActive);
+                btn.classList.toggle('text-silver', !isActive);
+            });
+        };
+
+        const updateStaticText = () => {
+            document.documentElement.lang = currentLang;
+            document.title = `${t('schoolName')} | ${t('hallOfFame')}`;
+
+            document.getElementById('hero-school-name').textContent = t('schoolName');
+            document.getElementById('hero-tour-name').textContent = t('tourName');
+            document.getElementById('hero-title').textContent = t('hallOfFame');
+            document.getElementById('hero-stats').innerHTML = t('heroStats');
+
+            document.getElementById('leaderboard-title').textContent = t('allTimeChampions');
+            document.getElementById('timeline-title').textContent = t('theEras');
+            document.getElementById('seasons-title').textContent = t('seasonArchives');
+            document.getElementById('bios-title').textContent = t('theLegends');
+            document.getElementById('records-title').textContent = t('hallOfRecords');
+
+            document.getElementById('social-title').textContent = t('followAction');
+            document.getElementById('social-subtitle').textContent = t('followActionSub');
+
+            document.getElementById('footer-title').textContent = t('footerTitle');
+            document.getElementById('footer-subtitle').textContent = t('footerSubtitle');
+            document.getElementById('footer-built-with').textContent = t('builtWith');
+            document.getElementById('footer-music-credit').innerHTML = `${t('musicCredit').replace('Audionautix.com', '<a href="https://audionautix.com" class="underline hover:text-silver/40">Audionautix.com</a>')}`;
+        };
+
+        // --- RENDER PODIUM ---
+        const renderPodium = () => {
+            const container = document.getElementById('podium-container');
+            const leaderboard = HSP_DATA.finalResults.moneyLeaderboard;
+            
+            // Order for visual podium: 2nd, 1st, 3rd, 4th
+            const visualOrder = [
+                { ...leaderboard[1], style: 'silver', height: 'h-80 md:h-96', icon: '🥈' },
+                { ...leaderboard[0], style: 'gold', height: 'h-96 md:h-[28rem]', icon: '♛', glow: true },
+                { ...leaderboard[2], style: 'bronze', height: 'h-72 md:h-80', icon: '🥉' },
+                { ...leaderboard[3], style: 'glass', height: 'h-64 md:h-72', icon: '❤️' }
+            ];
+            
+            // On mobile, stack them 1, 2, 3, 4
+            const mobileOrder = [
+                { ...leaderboard[0], style: 'gold', height: 'h-auto', icon: '♛', glow: true },
+                { ...leaderboard[1], style: 'silver', height: 'h-auto', icon: '🥈' },
+                { ...leaderboard[2], style: 'bronze', height: 'h-auto', icon: '🥉' },
+                { ...leaderboard[3], style: 'glass', height: 'h-auto', icon: '❤️' }
+            ];
+            
+            const isMobile = window.innerWidth < 768;
+            const orderToUse = isMobile ? mobileOrder : visualOrder;
+            
+            let html = '';
+            orderToUse.forEach((item) => {
+                const p = getPlayer(item.player);
+                const borderClass = item.style === 'gold' ? 'border-gold shadow-[0_0_30px_rgba(201,168,76,0.3)]' : 
+                                   item.style === 'silver' ? 'border-silver' : 
+                                   item.style === 'bronze' ? 'border-bronze' : 'border-white/10';
+                
+                const titleClass = item.style === 'gold' ? 'text-gold' : 
+                                  item.style === 'silver' ? 'text-silver' : 
+                                  item.style === 'bronze' ? 'text-bronze' : 'text-white/50';
+                
+                html += `
+                <div class="podium-card w-full md:w-64 ${item.height} glass rounded-2xl border-2 ${borderClass} flex flex-col items-center p-6 relative overflow-hidden group transition-transform hover:-translate-y-2">
+                    ${item.glow ? '<div class="absolute inset-0 bg-gold/5 z-0"></div>' : ''}
+                    <div class="relative z-10 flex flex-col items-center h-full w-full">
+                        <div class="text-3xl mb-2">${item.icon}</div>
+                        <div class="w-24 h-24 rounded-full overflow-hidden border-2 ${borderClass} mb-4">
+                            <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover">
+                        </div>
+                        <h3 class="font-cinzel text-2xl font-bold mb-1">${p.name}</h3>
+                        <p class="font-inter italic text-sm ${titleClass} mb-4 text-center">${getLocalized(HSP_DATA.playerBiographies[p.id].title)}</p>
+                        
+                        <div class="mt-auto w-full text-center">
+                            <div class="font-mono text-2xl font-bold mb-2">${formatMoney(item.money)}</div>
+                            <div class="flex justify-center gap-2 flex-wrap">
+                                <span class="text-xs bg-white/10 px-2 py-1 rounded">${p.allTimePlaces['1st']} ${t('wins')}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        // --- RENDER TIMELINE ---
+        const renderTimeline = () => {
+            const container = document.getElementById('timeline-nodes');
+            let html = '';
+            
+            HSP_DATA.seasons.forEach((season) => {
+                const champ = getPlayer(season.champion);
+                html += `
+                <div class="flex flex-col items-center relative group w-full md:w-1/4">
+                    <div class="text-gold font-mono text-sm mb-4">${t('season')} ${season.number}</div>
+                    <div class="w-16 h-16 rounded-full border-2 border-gold overflow-hidden relative z-10 bg-bg shadow-[0_0_15px_rgba(201,168,76,0.5)] transition-transform group-hover:scale-110">
+                        <img src="${champ.avatar}" alt="${champ.name}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="mt-4 text-center">
+                        <h4 class="font-cinzel text-lg text-white">${champ.name}</h4>
+                        <p class="text-xs text-silver/60 mt-1">${getLocalized(season.period)}</p>
+                        <p class="font-mono text-sm mt-1">${formatMoney(season.standings[0].money)}</p>
+                    </div>
+                    
+                    <!-- Hover Tooltip -->
+                    <div class="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-48 glass p-4 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-20 pointer-events-none">
+                        <h5 class="text-xs text-gold mb-2 border-b border-white/10 pb-1">${t('top4')}</h5>
+                        ${season.standings.map(s => `
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>${s.place}. ${getPlayer(s.player).name}</span>
+                                <span>${formatMoney(s.money)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        // --- RENDER SEASONS ---
+        const renderSeasons = () => {
+            const tabsContainer = document.getElementById('season-tabs');
+            const contentContainer = document.getElementById('season-content-container');
+            
+            let tabsHtml = '';
+            let contentHtml = '';
+            
+            HSP_DATA.seasons.forEach((season, index) => {
+                const isActive = index === 0;
+                const champ = getPlayer(season.champion);
+                
+                // Tabs
+                tabsHtml += `
+                <button onclick="switchSeason(${index})" class="season-tab px-6 py-2 rounded-full font-cinzel text-sm md:text-base transition-all duration-300 ${isActive ? 'bg-gold text-bg font-bold shadow-[0_0_15px_rgba(201,168,76,0.4)]' : 'glass text-silver hover:text-white'}">
+                    ${t('season')} ${season.number}
+                </button>`;
+                
+                // Content
+                contentHtml += `
+                <div id="season-content-${index}" class="season-content ${isActive ? 'active' : ''} absolute top-0 left-0 w-full">
+                    
+                    <!-- D1. Overview -->
+                    <div class="glass-gold rounded-2xl p-6 md:p-10 mb-8 flex flex-col md:flex-row items-center gap-8">
+                        <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-gold overflow-hidden shrink-0 relative">
+                            <img src="${champ.avatar}" alt="${champ.name}" class="w-full h-full object-cover">
+                            <div class="absolute -top-2 -right-2 text-4xl">👑</div>
+                        </div>
+                        <div class="flex-1 text-center md:text-left">
+                            <h3 class="font-cinzel text-3xl md:text-5xl text-gold mb-2">${getLocalized(season.name)}</h3>
+                            <p class="text-silver mb-6">${getLocalized(season.period)}</p>
+                            <div class="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8">
+                                <div>
+                                    <div class="text-xs text-silver/60 uppercase tracking-wider mb-1">${t('champion')}</div>
+                                    <div class="font-cinzel text-xl text-white">${champ.name} <span class="font-mono text-lg ml-2">${formatMoney(season.standings[0].money)}</span></div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-silver/60 uppercase tracking-wider mb-1">${t('prizePool')}</div>
+                                    <div class="font-mono text-xl text-gold">₽${season.totalPrizePool}</div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-silver/60 uppercase tracking-wider mb-1">${t('games')}</div>
+                                    <div class="font-mono text-xl text-white">${season.gameCount}</div>
+                                </div>
+                                ${season.goldenFish ? `
+                                <div>
+                                    <div class="text-xs text-silver/60 uppercase tracking-wider mb-1">${t('goldenFish')}</div>
+                                    <div class="font-cinzel text-xl text-bronze">${getPlayer(season.goldenFish.winner).name}</div>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- D2. Standings Table -->
+                    <div class="glass rounded-2xl overflow-hidden mb-8">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-white/5 border-b border-white/10">
+                                        <th class="p-4 font-cinzel text-gold">${t('place')}</th>
+                                        <th class="p-4 font-cinzel text-gold">${t('player')}</th>
+                                        <th class="p-4 font-cinzel text-gold text-right">${t('money')}</th>
+                                        <th class="p-4 font-cinzel text-gold text-center">${t('rebuys')}</th>
+                                        ${season.goldenFish ? `<th class="p-4 font-cinzel text-gold text-center">${t('fishPts')}</th>` : ''}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${season.standings.map((s, i) => {
+                                        const p = getPlayer(s.player);
+                                        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '💔';
+                                        return `
+                                        <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                            <td class="p-4 text-xl">${medal}</td>
+                                            <td class="p-4 flex items-center gap-3">
+                                                <img src="${p.avatar}" class="w-8 h-8 rounded-full object-cover">
+                                                <span class="font-bold">${p.name}</span>
+                                            </td>
+                                            <td class="p-4 font-mono text-right text-lg">${formatMoney(s.money)}</td>
+                                            <td class="p-4 font-mono text-center">${s.rebuys}</td>
+                                            ${season.goldenFish ? `<td class="p-4 font-mono text-center text-bronze">${s.goldenFish || '-'}</td>` : ''}
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- D3. Games & Chart -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                        <div class="space-y-4">
+                            <h4 class="font-cinzel text-2xl text-gold mb-4">${t('gameLog')}</h4>
+                            ${season.games.map(g => `
+                            <div class="game-card glass rounded-xl overflow-hidden cursor-pointer" onclick="this.classList.toggle('expanded')">
+                                <div class="p-4 flex justify-between items-center bg-white/5 hover:bg-white/10 transition-colors">
+                                    <div class="font-mono text-gold">${t('game')} ${g.number} <span class="text-silver text-sm ml-2">${g.date === 'Unknown' ? t('unknownDate') : (g.date || '')}</span></div>
+                                    <div class="flex items-center gap-4">
+                                        <span class="font-mono text-sm">${t('pool')}: ₽${g.totalPool}</span>
+                                        <svg class="w-5 h-5 chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                                <div class="game-card-content bg-black/30">
+                                    <div class="p-4 grid grid-cols-2 gap-4">
+                                        ${Object.entries(g.results).sort((a,b) => b[1] - a[1]).map(([pid, money]) => `
+                                            <div class="flex justify-between items-center">
+                                                <span class="text-sm">${getPlayer(pid).name}</span>
+                                                <span class="font-mono text-sm">${formatMoney(money)}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="glass rounded-2xl p-4 flex flex-col">
+                            <h4 class="font-cinzel text-2xl text-gold mb-4">${t('seasonTrajectory')}</h4>
+                            <div class="flex-1 min-h-[300px] relative">
+                                <canvas id="chart-season-${index}"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- D4. Insights -->
+                    <h4 class="font-cinzel text-2xl text-gold mb-6 mt-12">${t('seasonInsights')}</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${season.insights.map((insight, i) => `
+                            <div class="glass p-5 rounded-xl insight-card">
+                                <div class="w-8 h-8 rounded-full bg-gold/20 text-gold flex items-center justify-center font-mono text-sm mb-3 border border-gold/30">${i+1}</div>
+                                <p class="text-sm text-silver/90 leading-relaxed">${getLocalized(insight)}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                </div>`;
+            });
+            
+            tabsContainer.innerHTML = tabsHtml;
+            contentContainer.innerHTML = contentHtml;
+        };
+
+        // --- RENDER BIOGRAPHIES ---
+        const renderBiographies = () => {
+            const container = document.getElementById('bios-container');
+            const order = ['stparitet', 'safdenz', 'thegod', 'derupo'];
+            let html = '';
+            
+            order.forEach((pid, index) => {
+                const p = getPlayer(pid);
+                const isEven = index % 2 === 0;
+                const bioParagraphs = getLocalized(HSP_DATA.playerBiographies[pid].bio).split('\n\n').map(para => `<p class="mb-4 text-silver/90 leading-relaxed">${para}</p>`).join('');
+                
+                html += `
+                <div class="flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 md:gap-16 items-center bio-section">
+                    <div class="w-64 h-64 md:w-80 md:h-80 shrink-0 relative">
+                        <div class="absolute inset-0 rounded-full bg-gold/20 blur-2xl"></div>
+                        <img src="${p.avatar}" alt="${p.name}" class="w-full h-full object-cover rounded-full border-4 border-gold/50 relative z-10 animate-float shadow-2xl">
+                    </div>
+                    
+                    <div class="flex-1 text-center ${isEven ? 'md:text-left' : 'md:text-right'}">
+                        <h3 class="font-cinzel text-4xl md:text-6xl text-white mb-2">${p.name}</h3>
+                        <h4 class="font-cinzel text-xl md:text-2xl text-gold italic mb-6">"${getLocalized(HSP_DATA.playerBiographies[pid].title)}"</h4>
+                        
+                        <div class="flex flex-wrap justify-center ${isEven ? 'md:justify-start' : 'md:justify-end'} gap-2 mb-8">
+                            ${p.titles.map(titleKey => `<span class="px-3 py-1 rounded-full glass text-xs text-gold border-gold/30">${t(titleKey)}</span>`).join('')}
+                        </div>
+                        
+                        <div class="grid grid-cols-3 md:grid-cols-5 gap-4 mb-8 glass p-4 rounded-2xl">
+                            <div class="text-center">
+                                <div class="text-xs text-silver/60 uppercase">${t('games')}</div>
+                                <div class="font-mono text-xl">${p.totalGames}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-silver/60 uppercase">${t('wins')}</div>
+                                <div class="font-mono text-xl">${p.allTimePlaces['1st']}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-silver/60 uppercase">${t('winPct')}</div>
+                                <div class="font-mono text-xl">${Math.round((p.allTimePlaces['1st']/p.totalGames)*100)}%</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-silver/60 uppercase">${t('total')}</div>
+                                <div class="font-mono text-xl">${formatMoney(p.totalMoney)}</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-xs text-silver/60 uppercase">${t('rebuys')}</div>
+                                <div class="font-mono text-xl">${p.totalRebuys}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-left font-inter text-sm md:text-base">
+                            ${bioParagraphs}
+                        </div>
+                        
+                        <div class="mt-8 h-40 w-full glass rounded-xl p-2">
+                            <canvas id="chart-bio-${pid}"></canvas>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        // --- RENDER RECORDS ---
+        const renderRecords = () => {
+            const container = document.getElementById('records-grid');
+            const records = [
+                { icon: '🏆', title: t('recMostSeasonWins'), value: 'Stparitet (3)', pid: 'stparitet' },
+                { icon: '💰', title: t('recBiggestSingleWin'), value: 'TheGod +3500', pid: 'thegod' },
+                { icon: '📉', title: t('recWorstSeason'), value: 'TheGod -4950', pid: 'thegod' },
+                { icon: '🔥', title: t('recLongestWinStreak'), value: 'Safdenz (4)', pid: 'safdenz' },
+                { icon: '🎯', title: t('recHighestWinRate'), value: 'Safdenz 44%', pid: 'safdenz' },
+                { icon: '🐟', title: t('recGoldenFishRecord'), value: 'TheGod 15pts', pid: 'thegod' },
+                { icon: '💎', title: t('recFewestRebuys'), value: 'Safdenz & TheGod (7)', pid: null },
+                { icon: '🎰', title: t('recBiggestPrizePool'), value: 'S3 G7 ₽6000', pid: null },
+                { icon: '⏱️', title: t('recMostTimeAtTable'), value: 'TheGod 3405m', pid: 'thegod' },
+                { icon: '0️⃣', title: t('recZeroRebuysSeason'), value: 'TheGod (S3)', pid: 'thegod' },
+                { icon: '🏅', title: t('recMost1stPlaces'), value: 'Stparitet & Safdenz (9)', pid: null },
+                { icon: '💔', title: t('recMost4thPlaces'), value: 'Derupo (12)', pid: 'derupo' },
+            ];
+            
+            let html = '';
+            records.forEach(r => {
+                const p = r.pid ? getPlayer(r.pid) : null;
+                html += `
+                <div class="glass p-6 rounded-2xl flex flex-col items-center text-center hover:bg-white/5 transition-colors record-card">
+                    <div class="text-4xl mb-4">${r.icon}</div>
+                    <h5 class="text-silver text-sm uppercase tracking-wider mb-2">${r.title}</h5>
+                    <div class="font-cinzel text-xl text-gold mb-4">${r.value}</div>
+                    ${p ? `<img src="${p.avatar}" class="w-10 h-10 rounded-full object-cover border border-white/20 mt-auto">` : '<div class="h-10 mt-auto"></div>'}
+                </div>`;
+            });
+            
+            container.innerHTML = html;
+        };
+
+        // --- RENDER FOOTER ---
+        const renderFooter = () => {
+            const container = document.getElementById('footer-avatars');
+            let html = '';
+            Object.values(HSP_DATA.players).forEach(p => {
+                html += `<img src="${p.avatar}" class="w-10 h-10 rounded-full object-cover border border-white/20 grayscale hover:grayscale-0 transition-all">`;
+            });
+            container.innerHTML = html;
+        };
+
+        // --- CHARTS ---
+        const initCharts = () => {
+            Chart.defaults.color = '#b0b8c1';
+            Chart.defaults.font.family = 'JetBrains Mono';
+            
+            // Season Charts
+            HSP_DATA.seasons.forEach((season, index) => {
+                const ctx = document.getElementById(`chart-season-${index}`);
+                if (!ctx) return;
+                
+                const labels = season.games.map(g => `G${g.number}`);
+                const datasets = Object.keys(HSP_DATA.players).map(pid => {
+                    let cumulative = 0;
+                    const data = season.games.map(g => {
+                        cumulative += (g.results[pid] || 0);
+                        return cumulative;
+                    });
+                    return {
+                        label: getPlayer(pid).name,
+                        data: data,
+                        borderColor: playerColors[pid],
+                        backgroundColor: `${playerColors[pid]}20`,
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    };
+                });
+                
+                const seasonChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels, datasets },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12 } },
+                            tooltip: {
+                                callbacks: {
+                                    label: (context) => `${context.dataset.label}: ${context.raw > 0 ? '+' : ''}₽${context.raw}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { grid: { color: 'rgba(255,255,255,0.05)' } },
+                            x: { grid: { color: 'rgba(255,255,255,0.05)' } }
+                        }
+                    }
+                });
+                chartInstances.push(seasonChart);
+            });
+            
+            // Bio Charts
+            Object.keys(HSP_DATA.players).forEach(pid => {
+                const ctx = document.getElementById(`chart-bio-${pid}`);
+                if (!ctx) return;
+                
+                const p = getPlayer(pid);
+                const labels = p.seasonResults.map(s => `S${s.season}`);
+                let cumulative = 0;
+                const data = p.seasonResults.map(s => {
+                    cumulative += s.money;
+                    return cumulative;
+                });
+                
+                const bioChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: t('cumulativeEarnings'),
+                            data: data,
+                            borderColor: playerColors[pid],
+                            backgroundColor: `${playerColors[pid]}20`,
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { display: false },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+                chartInstances.push(bioChart);
+            });
+        };
+
+        // --- TAB SWITCHING ---
+        window.switchSeason = (index) => {
+            document.querySelectorAll('.season-tab').forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('bg-gold', 'text-bg', 'font-bold', 'shadow-[0_0_15px_rgba(201,168,76,0.4)]');
+                    tab.classList.remove('glass', 'text-silver');
+                } else {
+                    tab.classList.remove('bg-gold', 'text-bg', 'font-bold', 'shadow-[0_0_15px_rgba(201,168,76,0.4)]');
+                    tab.classList.add('glass', 'text-silver');
+                }
+            });
+            
+            document.querySelectorAll('.season-content').forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                    // Trigger GSAP animation for insights in this tab
+                    gsap.fromTo(content.querySelectorAll('.insight-card'), 
+                        { y: 30, opacity: 0 },
+                        { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "power2.out" }
+                    );
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        };
+
+        const rerenderLocalizedSections = () => {
+            destroyCharts();
+            updateStaticText();
+            renderPodium();
+            renderTimeline();
+            renderSeasons();
+            renderBiographies();
+            renderRecords();
+            renderFooter();
+            renderLangButtons();
+            initCharts();
+
+            const activeContent = document.querySelector('.season-content.active');
+            if (activeContent) {
+                document.getElementById('season-content-container').style.height = `${activeContent.offsetHeight}px`;
+            }
+        };
+
+        window.setLang = (lang) => {
+            currentLang = ['en', 'ru', 'de', 'es'].includes(lang) ? lang : 'en';
+            localStorage.setItem('hsp-lang', currentLang);
+            rerenderLocalizedSections();
+            initHeroTitleAnimation();
+            document.querySelectorAll('.hero-letter').forEach((letter) => {
+                letter.style.opacity = '1';
+            });
+        };
+
+        const initHeroTitleAnimation = () => {
+            const title = document.getElementById('hero-title');
+            if (!title) return;
+
+            const text = title.innerText;
+            title.innerHTML = '';
+            text.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.innerText = char === ' ' ? '\u00A0' : char;
+                span.className = 'hero-letter';
+                title.appendChild(span);
+            });
+        };
+
+        // --- ANIMATIONS ---
+        const initAnimations = () => {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Hero
+            initHeroTitleAnimation();
+            
+            const tl = gsap.timeline();
+            tl.to('.hero-letter', { opacity: 1, duration: 0.1, stagger: 0.05, ease: "none" })
+              .to('.hero-elem', { opacity: 1, y: 0, duration: 1, stagger: 0.2, ease: "power3.out" }, "-=0.5");
+              
+            // Podium
+            gsap.to('.podium-card', {
+                scrollTrigger: { trigger: '#leaderboard', start: "top 70%" },
+                scale: 1, opacity: 1, duration: 0.8, stagger: 0.15, ease: "back.out(1.5)"
+            });
+            
+            // Timeline
+            gsap.to('.timeline-line', {
+                scrollTrigger: { trigger: '#timeline', start: "top 60%" },
+                width: "100%", duration: 1.5, ease: "power2.inOut"
+            });
+            
+            gsap.from('#timeline-nodes > div', {
+                scrollTrigger: { trigger: '#timeline', start: "top 60%" },
+                y: 30, opacity: 0, duration: 0.6, stagger: 0.3, ease: "power2.out", delay: 0.2
+            });
+            
+            // Bios
+            gsap.utils.toArray('.bio-section').forEach(section => {
+                gsap.from(section, {
+                    scrollTrigger: { trigger: section, start: "top 75%" },
+                    y: 50, opacity: 0, duration: 1, ease: "power3.out"
+                });
+            });
+            
+            // Records
+            gsap.from('.record-card', {
+                scrollTrigger: { trigger: '#records', start: "top 70%" },
+                scale: 0.8, opacity: 0, duration: 0.5, stagger: 0.05, ease: "back.out(1.2)"
+            });
+        };
+
+        // --- AUDIO ---
+        const initAudio = () => {
+            const audio = document.getElementById('bg-music');
+            const btn = document.getElementById('music-toggle');
+            const iconMuted = document.getElementById('icon-muted');
+            const iconPlaying = document.getElementById('icon-playing');
+            
+            audio.volume = 0.3;
+            let isPlaying = false;
+            let hasInteracted = false;
+            
+            const toggleMusic = () => {
+                if (isPlaying) {
+                    audio.pause();
+                    iconMuted.classList.remove('hidden');
+                    iconPlaying.classList.add('hidden');
+                    btn.classList.remove('shadow-[0_0_20px_rgba(201,168,76,0.6)]');
+                } else {
+                    const playPromise = audio.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            iconMuted.classList.add('hidden');
+                            iconPlaying.classList.remove('hidden');
+                            btn.classList.add('shadow-[0_0_20px_rgba(201,168,76,0.6)]');
+                        }).catch(e => {
+                            console.log("Audio play failed:", e);
+                            // Try fallback source if first fails
+                            if(audio.currentSrc.includes('the-voyage')) {
+                                audio.src = "audio/epic-series.mp3";
+                                audio.play().catch(e2 => console.log("Fallback failed too", e2));
+                            }
+                        });
+                    }
+                }
+                isPlaying = !isPlaying;
+            };
+            
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hasInteracted = true;
+                toggleMusic();
+            });
+            
+            // Auto-play on first interaction
+            const onInteract = () => {
+                if (!hasInteracted) {
+                    hasInteracted = true;
+                    toggleMusic();
+                }
+                document.removeEventListener('click', onInteract);
+                document.removeEventListener('scroll', onInteract);
+            };
+            
+            document.addEventListener('click', onInteract);
+            document.addEventListener('scroll', onInteract, { once: true });
+        };
+
+        // --- PARTICLES ---
+        const initParticles = () => {
+            const canvas = document.getElementById('particles-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            const particles = [];
+            
+            const resize = () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            };
+            
+            window.addEventListener('resize', resize);
+            resize();
+            
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * width;
+                    this.y = Math.random() * height;
+                    this.size = Math.random() * 2 + 0.5;
+                    this.speedY = Math.random() * -0.5 - 0.1;
+                    this.speedX = Math.random() * 0.4 - 0.2;
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+                update() {
+                    this.y += this.speedY;
+                    this.x += this.speedX;
+                    if (this.y < 0) {
+                        this.y = height;
+                        this.x = Math.random() * width;
+                    }
+                }
+                draw() {
+                    ctx.fillStyle = `rgba(201, 168, 76, ${this.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle());
+            }
+            
+            const animate = () => {
+                ctx.clearRect(0, 0, width, height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                requestAnimationFrame(animate);
+            };
+            
+            animate();
+        };
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            rerenderLocalizedSections();
+            
+            // Small delay to ensure DOM is ready for charts and GSAP
+            setTimeout(() => {
+                initAnimations();
+                initAudio();
+                initParticles();
+                
+                // Set initial season content height
+                const activeContent = document.querySelector('.season-content.active');
+                if(activeContent) {
+                    document.getElementById('season-content-container').style.height = `${activeContent.offsetHeight}px`;
+                }
+            }, 100);
+        });
+        
+        // Update container height on window resize or tab switch
+        window.addEventListener('resize', () => {
+            const activeContent = document.querySelector('.season-content.active');
+            if(activeContent) {
+                document.getElementById('season-content-container').style.height = `${activeContent.offsetHeight}px`;
+            }
+        });
+        
+        // Override switchSeason to also update container height
+        const originalSwitchSeason = window.switchSeason;
+        window.switchSeason = (index) => {
+            originalSwitchSeason(index);
+            setTimeout(() => {
+                const activeContent = document.querySelector('.season-content.active');
+                if(activeContent) {
+                    document.getElementById('season-content-container').style.height = `${activeContent.offsetHeight}px`;
+                }
+            }, 50);
+        };
+    </script>
+</body>
+</html>
